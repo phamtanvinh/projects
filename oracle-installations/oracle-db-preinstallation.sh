@@ -9,6 +9,7 @@ CONFIG_IPTABLE_FILE='/etc/sysconfig/iptables'
 IP_ADDR=`ip -f inet a show eth1| sed -e 's/[ \/]/\n/g'| grep '\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}' -m 1`
 HOSTNAME='ords'
 SELINUX_STATUS='permissive'
+STAGE_DIR='/stage'
 
 ORACLE_VER='11.2.0'
 ORACLE_PASSWORD='123456'
@@ -20,6 +21,7 @@ ORACLE_PORTS=('1158' '1521')
 
 ORACLE_DB_FILE_1=/data/linux.x64_11gR2_database_1of2.zip
 ORACLE_DB_FILE_2=/data/linux.x64_11gR2_database_2of2.zip
+ORACLE_RESPONSEFILE='./db11R2.rsp'
 
 echo "Remove oracle"
 userdel -r oracle &>/dev/null
@@ -60,8 +62,8 @@ mkdir -p $ORACLE_HOME
 chown -R oracle:oinstall /u01
 chmod -R 775 /u01
 
-rm -rf /stage
-mkdir -p /stage
+rm -rf $STAGE_DIR
+mkdir -p $STAGE_DIR
 
 echo "Unzip files if exist..."
 [ -f $ORACLE_DB_FILE_1 ] && unzip -o $ORACLE_DB_FILE_1 -d /stage 
@@ -81,8 +83,6 @@ done
 iptables-restore < $CONFIG_IPTABLE_FILE
 /etc/init.d/iptables restart
 
-
-
 echo "Setting Oracle DB"
 ORACLE_DB_SETTING="
 # Setting Oracle DB
@@ -101,4 +101,15 @@ export CLASSPATH=$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib;
 "
 su oracle -c "echo \"$ORACLE_DB_SETTING\" >> ~/.bash_profile"
 
+echo "# After running successfully, running commands below:
+cp $(readlink -f $ORACLE_RESPONSEFILE) /tmp
+$STAGE_DIR/database/runInstaller  -ignoreSysPrereqs -ignorePrereq -waitforcompletion -silent -responseFile /tmp/$(basename $ORACLE_RESPONSEFILE)
+# After installing successfully run this commands or copy from terminal:
+/u01/app/oraInventory/orainstRoot.sh
+/u01/app/oracle/product/11.2.0/dbhome/root.sh
+" > ~/$(basename "$0").log
+echo "Using GUI to install or see log ~/$(basename "$0").log for next silent installation.
+Reboot after 5s"
+
+sleep 5
 reboot
