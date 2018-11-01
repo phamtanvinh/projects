@@ -1,5 +1,5 @@
  
-#!/bin/bash
+#!/bin/sh
 # install odb 11g on Centos 6
 
 CONFIG_NETWORK_FILE=/etc/sysconfig/network
