@@ -104,7 +104,7 @@ export LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib;
 export CLASSPATH=$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib;
 "
 su oracle -c "echo \"$ORACLE_DB_SETTING\" >> ~/.bash_profile"
-cp $(readlink -f $ORACLE_RESPONSEFILE) /tmp
+cp -rf $(readlink -f $ORACLE_RESPONSEFILE) /tmp
 
 echo "# After running successfully, running commands below:
 $STAGE_DIR/database/runInstaller  -ignoreSysPrereqs -ignorePrereq -waitforcompletion -silent -responseFile /tmp/$(basename $ORACLE_RESPONSEFILE)
