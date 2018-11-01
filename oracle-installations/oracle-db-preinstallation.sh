@@ -1,12 +1,9 @@
- 
-#!/bin/sh
 # install odb 11g on Centos 6
-
 CONFIG_NETWORK_FILE=/etc/sysconfig/network
 CONFIG_HOSTS_FILE='/etc/hosts'
 CONFIG_SELINUX_FILE='/etc/selinux/config'
 CONFIG_IPTABLE_FILE='/etc/sysconfig/iptables'
-IP_ADDR=`ip -f inet a show eth1| sed -e 's/[ \/]/\n/g'| grep '\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}' -m 1`
+IP_ADDR=$(ip -f inet a show eth1| sed -e 's/[ \/]/\n/g'| grep '\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}' -m 1)
 HOSTNAME='ords'
 SELINUX_STATUS='permissive'
 STAGE_DIR='/stage'
@@ -15,7 +12,8 @@ ORACLE_VER='11.2.0'
 ORACLE_PASSWORD='123456'
 ORACLE_UNQNAME='orcl'
 ORACLE_SID='orcl'
-ORACLE_BASE='/u01/app/oracle'
+ORACLE_DB_DIR='/u01'
+ORACLE_BASE="$ORACLE_DB_DIR/app/oracle"
 ORACLE_HOME="$ORACLE_BASE/product/$ORACLE_VER/dbhome"
 ORACLE_PORTS=('1158' '1521')
 
@@ -59,9 +57,10 @@ echo "Setting SELinux..."
 sed -c -i "s/^\(SELINUX=\).*/\1$SELINUX_STATUS/" $CONFIG_SELINUX_FILE
 
 echo "Create directory"
+rm -rf $ORACLE_DB_DIR
 mkdir -p $ORACLE_HOME
-chown -R oracle:oinstall /u01
-chmod -R 775 /u01
+chown -R oracle:oinstall $ORACLE_DB_DIR
+chmod -R 775 $ORACLE_DB_DIR
 
 rm -rf $STAGE_DIR
 mkdir -p $STAGE_DIR
@@ -71,13 +70,14 @@ echo "Unzip files if exist..."
 [ -f $ORACLE_DB_FILE_2 ] && unzip -o $ORACLE_DB_FILE_2 -d /stage 
 
 echo "Open port for oracle db"
-
+echo "Backup $CONFIG_IPTABLE_FILE to $CONFIG_IPTABLE_FILE.$(date +%s)"
 cp $CONFIG_IPTABLE_FILE $CONFIG_IPTABLE_FILE.$(date +%s)
 
-for PORT in ${ORACLE_PORTS[@]};
+for PORT in ${ORACLE_PORTS[@]}
 do
+	TMP="grep -e \"-A INPUT.*--dport.*-j ACCEPT\" -m 1 $CONFIG_IPTABLE_FILE"
     TMP_ADD_PORT="-A INPUT -m state --state NEW -m tcp -p tcp --dport $PORT -j ACCEPT"
-    grep -- "-A INPUT.*-dport $PORT.*-j ACCEPT" $CONFIG_IPTABLE_FILE &>/dev/null || sed -c -i "0,/$TMP/s/$TMP/$TMP\n$TMP_ADD_PORT/" $CONFIG_IPTABLE_FILE
+    grep -e "-A INPUT.*-dport $PORT.*-j ACCEPT" $CONFIG_IPTABLE_FILE &>/dev/null || sed -c -i "0,/$TMP/s/$TMP/$TMP\n$TMP_ADD_PORT/" $CONFIG_IPTABLE_FILE
 
 done
 
@@ -106,8 +106,8 @@ echo "# After running successfully, running commands below:
 cp $(readlink -f $ORACLE_RESPONSEFILE) /tmp
 $STAGE_DIR/database/runInstaller  -ignoreSysPrereqs -ignorePrereq -waitforcompletion -silent -responseFile /tmp/$(basename $ORACLE_RESPONSEFILE)
 # After installing successfully run this commands or copy from terminal:
-/u01/app/oraInventory/orainstRoot.sh
-/u01/app/oracle/product/11.2.0/dbhome/root.sh
+$ORACLE_DB_DIR/app/oraInventory/orainstRoot.sh
+$ORACLE_DB_DIR/app/oracle/product/11.2.0/dbhome/root.sh
 " > ~/$(basename "$0").log
 echo "Using GUI to install or see log ~/$(basename "$0").log for next silent installation.
 Reboot after 5s"
