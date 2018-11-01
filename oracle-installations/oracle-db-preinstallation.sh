@@ -9,6 +9,8 @@ SELINUX_STATUS='permissive'
 STAGE_DIR='/stage'
 
 ORACLE_VER='11.2.0'
+ORACLE_USER='oracle'
+ORACLE_GROUP='oinstall'
 ORACLE_PASSWORD='123456'
 ORACLE_UNQNAME='orcl'
 ORACLE_SID='orcl'
@@ -22,8 +24,19 @@ ORACLE_DB_FILE_1=/data/linux.x64_11gR2_database_1of2.zip
 ORACLE_DB_FILE_2=/data/linux.x64_11gR2_database_2of2.zip
 ORACLE_RESPONSEFILE='db11R2.rsp'
 
+[ $(id -u $ORACLE_USER 2>/dev/null) ] && echo "User oracle was installed." &&
+while true; do
+
+    read -p "Do you wish to install this program?" yn
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+
 echo "Remove oracle"
-userdel -r oracle &>/dev/null
+userdel -r $ORACLE_USER &>/dev/null
 [ -f $ORACLE_ORATAB ] && sed -c -i "s/^$ORACLE_SID.*//" $ORACLE_ORATAB
 
 echo "Download wget, zip, unzip, rlwrap"
@@ -58,7 +71,7 @@ echo "* - nproc 16384" >> /etc/security/limits.d/90-nproc.conf
 echo "Create directory"
 rm -rf $ORACLE_DB_DIR
 mkdir -p $ORACLE_HOME
-chown -R oracle:oinstall $ORACLE_DB_DIR
+chown -R $ORACLE_USER:$ORACLE_GROUP $ORACLE_DB_DIR
 chmod -R 775 $ORACLE_DB_DIR
 
 rm -rf $STAGE_DIR
@@ -102,7 +115,7 @@ export PATH=$ORACLE_HOME/bin:$PATH;
 export LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib;
 export CLASSPATH=$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib;
 "
-su oracle -c "echo \"$ORACLE_DB_SETTING\" >> ~/.bash_profile"
+su $ORACLE_USER -c "echo \"$ORACLE_DB_SETTING\" >> ~/.bash_profile"
 cp -rf $(readlink -f $ORACLE_RESPONSEFILE) /tmp
 
 echo "# After running successfully, running commands below:
