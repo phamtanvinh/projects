@@ -107,10 +107,7 @@ su oracle -c "echo \"$ORACLE_DB_SETTING\" >> ~/.bash_profile"
 cp -rf $(readlink -f $ORACLE_RESPONSEFILE) /tmp
 
 echo "# After running successfully, running commands below:
-$STAGE_DIR/database/runInstaller  -ignoreSysPrereqs -ignorePrereq -waitforcompletion -silent -responseFile /tmp/$(basename $ORACLE_RESPONSEFILE)
-# After installing successfully run this commands or copy from terminal:
-$ORACLE_DB_DIR/app/oraInventory/orainstRoot.sh
-$ORACLE_DB_DIR/app/oracle/product/11.2.0/dbhome/root.sh
+$STAGE_DIR/database/runInstaller -ignoreSysPrereqs -ignorePrereq -waitforcompletion -silent -responseFile /tmp/$(basename $ORACLE_RESPONSEFILE)∏
 " > ~/$(basename "$0").log
 echo "Using GUI to install or see log ~/$(basename "$0").log for next silent installation.
 Reboot after 5s"
