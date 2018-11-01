@@ -75,7 +75,7 @@ cp $CONFIG_IPTABLE_FILE $CONFIG_IPTABLE_FILE.$(date +%s)
 
 for PORT in ${ORACLE_PORTS[@]}
 do
-	TMP="grep -e \"-A INPUT.*--dport.*-j ACCEPT\" -m 1 $CONFIG_IPTABLE_FILE"
+	TMP=$(cat $CONFIG_IPTABLE_FILE| grep -e "-A INPUT.*--dport.*-j ACCEPT" -m 1)
     TMP_ADD_PORT="-A INPUT -m state --state NEW -m tcp -p tcp --dport $PORT -j ACCEPT"
     grep -e "-A INPUT.*-dport $PORT.*-j ACCEPT" $CONFIG_IPTABLE_FILE &>/dev/null || sed -c -i "0,/$TMP/s/$TMP/$TMP\n$TMP_ADD_PORT/" $CONFIG_IPTABLE_FILE
 
