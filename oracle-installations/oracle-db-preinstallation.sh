@@ -10,11 +10,12 @@ IP_ADDR=`ip -f inet a show eth1| sed -e 's/[ \/]/\n/g'| grep '\([0-9]\{1,3\}\.\)
 HOSTNAME='ords'
 SELINUX_STATUS='permissive'
 
+ORACLE_VER='11.2.0'
 ORACLE_PASSWORD='123456'
 ORACLE_UNQNAME='orcl'
 ORACLE_SID='orcl'
 ORACLE_BASE='/u01/app/oracle'
-ORACLE_HOME="$ORACLE_BASE/product/11.2.0/dbhome"
+ORACLE_HOME="$ORACLE_BASE/product/$ORACLE_VER/dbhome"
 ORACLE_PORTS=('1158' '1521')
 
 ORACLE_DB_FILE_1=/data/linux.x64_11gR2_database_1of2.zip
@@ -36,7 +37,7 @@ wget https://public-yum.oracle.com/RPM-GPG-KEY-oracle-ol6 -O /etc/pki/rpm-gpg/RP
 
 echo "Download Preinstallation"
 yum -q list installed oracle-rdbms-server-11gR2-preinstall &>/dev/null && yum remove -y oracle-rdbms-server-11gR2-preinstall &>/dev/null
-yum install -y oracle-rdbms-server-11gR2-preinstall &>/dev/null
+yum install -y oracle-rdbms-server-11gR2-preinstall
 
 echo "Setting hostname..."
 
