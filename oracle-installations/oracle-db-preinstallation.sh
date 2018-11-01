@@ -7,6 +7,7 @@ IP_ADDR=$(ip -f inet a show eth1| sed -e 's/[ \/]/\n/g'| grep '\([0-9]\{1,3\}\.\
 HOSTNAME='ords'
 SELINUX_STATUS='permissive'
 STAGE_DIR='/stage'
+SCRIPT_DIR=$( dirname "${BASH_SOURCE[0]}" )
 
 ORACLE_VER='11.2.0'
 ORACLE_USER='oracle'
@@ -15,14 +16,14 @@ ORACLE_PASSWORD='123456'
 ORACLE_UNQNAME='orcl'
 ORACLE_SID='orcl'
 ORACLE_DB_DIR='/u01'
-ORACLE_BASE="$ORACLE_DB_DIR/app/oracle"
-ORACLE_HOME="$ORACLE_BASE/product/$ORACLE_VER/dbhome"
+ORACLE_BASE=$ORACLE_DB_DIR/app/oracle
+ORACLE_HOME=$ORACLE_BASE/product/$ORACLE_VER/dbhome
 ORACLE_PORTS=('1158' '1521')
 ORACLE_ORATAB=/ect/oratab
 
 ORACLE_DB_FILE_1=/data/linux.x64_11gR2_database_1of2.zip
 ORACLE_DB_FILE_2=/data/linux.x64_11gR2_database_2of2.zip
-ORACLE_RESPONSEFILE='db11R2.rsp'
+ORACLE_RESPONSEFILE=$SCRIPT_DIR/db11R2.rsp
 
 [ $(id -u $ORACLE_USER 2>/dev/null) ] && echo "User oracle was installed." &&
 while true; do
@@ -90,7 +91,7 @@ cp $CONFIG_IPTABLE_FILE $CONFIG_IPTABLE_FILE.$(date +%s)
 
 for PORT in ${ORACLE_PORTS[@]}
 do
-	TMP=$(cat $CONFIG_IPTABLE_FILE| grep -e "-A INPUT.*--dport.*-j ACCEPT" -m 1)
+    TMP=$(cat $CONFIG_IPTABLE_FILE| grep -e "-A INPUT.*--dport.*-j ACCEPT" -m 1)
     TMP_ADD_PORT="-A INPUT -m state --state NEW -m tcp -p tcp --dport $PORT -j ACCEPT"
     grep -e "-A INPUT.*-dport $PORT.*-j ACCEPT" $CONFIG_IPTABLE_FILE &>/dev/null || sed -c -i "0,/$TMP/s/$TMP/$TMP\n$TMP_ADD_PORT/" $CONFIG_IPTABLE_FILE
 
@@ -116,17 +117,19 @@ export LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib;
 export CLASSPATH=$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib;
 "
 su $ORACLE_USER -c "echo \"$ORACLE_DB_SETTING\" >> ~/.bash_profile"
-cp -rf $(readlink -f $ORACLE_RESPONSEFILE) /tmp
+cp -rf $ORACLE_RESPONSEFILE) /tmp
 
 echo "# After running successfully, running commands below:
 $STAGE_DIR/database/runInstaller -ignoreSysPrereqs -ignorePrereq -waitforcompletion -silent -responseFile /tmp/$(basename $ORACLE_RESPONSEFILE)
 " > ~/$(basename "$0").log
-echo "Using GUI to install or see log ~/$(basename "$0").log for next silent installation.
-Reboot after 5s"
-
-sleep 5
+echo "Using GUI to install or see log ~/$(basename "$0").log for next silent installation."
 
 echo "Checking SELinux..."
-[ $(grep 'SELINUX=permissive' /etc/sysconfig/selinux 2>/dev/null) ] && echo "Have set permissive" || sed -c -i "s/^\(SELINUX=\).*/\1$SELINUX_STATUS/" $CONFIG_SELINUX_FILE; reboot
+if [ $(grep 'SELINUX=permissive' /etc/sysconfig/selinux 2>/dev/null) ]; then 
+    echo "Have set permissive"
+else 
+    sed -c -i "s/^\(SELINUX=\).*/\1$SELINUX_STATUS/" $CONFIG_SELINUX_FILE 
+    reboot
+fi
 
 
