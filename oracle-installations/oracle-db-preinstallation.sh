@@ -66,6 +66,9 @@ rm -rf $STAGE_DIR
 mkdir -p $STAGE_DIR
 
 echo "Unzip files if exist..."
+#mount storage
+[ -f $ORACLE_DB_FILE_1 ] || echo "Mounting storage ..."; mount /dev/sdb /data &> /dev/null
+
 [ -f $ORACLE_DB_FILE_1 ] && unzip -o $ORACLE_DB_FILE_1 -d /stage 
 [ -f $ORACLE_DB_FILE_2 ] && unzip -o $ORACLE_DB_FILE_2 -d /stage 
 
@@ -101,9 +104,9 @@ export LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib;
 export CLASSPATH=$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib;
 "
 su oracle -c "echo \"$ORACLE_DB_SETTING\" >> ~/.bash_profile"
+cp $(readlink -f $ORACLE_RESPONSEFILE) /tmp
 
 echo "# After running successfully, running commands below:
-cp $(readlink -f $ORACLE_RESPONSEFILE) /tmp
 $STAGE_DIR/database/runInstaller  -ignoreSysPrereqs -ignorePrereq -waitforcompletion -silent -responseFile /tmp/$(basename $ORACLE_RESPONSEFILE)
 # After installing successfully run this commands or copy from terminal:
 $ORACLE_DB_DIR/app/oraInventory/orainstRoot.sh
