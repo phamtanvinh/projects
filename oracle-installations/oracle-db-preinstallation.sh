@@ -64,7 +64,7 @@ grep "$IP_ADDR" /etc/hosts &>/dev/null && sed -c -i "s/^\(\b$IP_ADDR\b\).*/\1  $
 /etc/init.d/network restart &>/dev/null
 
 echo "Oracle user setting..."
-echo "oracle:$ORACLE_PASSWORD" | chpasswd
+echo "$ORACLE_USER:$ORACLE_PASSWORD" | chpasswd
 
 echo "* - nproc 16384" >> /etc/security/limits.d/90-nproc.conf
 
@@ -81,8 +81,8 @@ echo "Unzip files if exist..."
 #mount storage
 [ -f $ORACLE_DB_FILE_1 ] || echo "Mounting storage ..."; mount /dev/sdb /data &> /dev/null
 
-[ -f $ORACLE_DB_FILE_1 ] && unzip -o $ORACLE_DB_FILE_1 -d /stage 
-[ -f $ORACLE_DB_FILE_2 ] && unzip -o $ORACLE_DB_FILE_2 -d /stage 
+[ -f $ORACLE_DB_FILE_1 ] && [[ $(unzip -o $ORACLE_DB_FILE_1 -d /stage &>/dev/null) || true ]] && echo "Extract $ORACLE_DB_FILE_1 OK"
+[ -f $ORACLE_DB_FILE_2 ] && [[ $(unzip -o $ORACLE_DB_FILE_2 -d /stage &>/dev/null) || true ]] && echo "Extract $ORACLE_DB_FILE_2 OK"
 
 echo "Open port for oracle db"
 echo "Backup $CONFIG_IPTABLE_FILE to $CONFIG_IPTABLE_FILE.$(date +%s)"
@@ -127,6 +127,6 @@ Reboot after 5s"
 sleep 5
 
 echo "Checking SELinux..."
-grep 'SELINUX=permissive' /etc/sysconfig/selinux 2&>/dev/null && echo "Have set permissive" || sed -c -i "s/^\(SELINUX=\).*/\1$SELINUX_STATUS/" $CONFIG_SELINUX_FILE; reboot
+[ $(grep 'SELINUX=permissive' /etc/sysconfig/selinux 2>/dev/null) ] && echo "Have set permissive" || sed -c -i "s/^\(SELINUX=\).*/\1$SELINUX_STATUS/" $CONFIG_SELINUX_FILE; reboot
 
 
