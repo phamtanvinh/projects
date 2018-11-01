@@ -19,7 +19,7 @@ ORACLE_DB_DIR='/u01'
 ORACLE_BASE=$ORACLE_DB_DIR/app/oracle
 ORACLE_HOME=$ORACLE_BASE/product/$ORACLE_VER/dbhome
 ORACLE_PORTS=('1158' '1521')
-ORACLE_ORATAB=/ect/oratab
+ORACLE_ORATAB=/etc/oratab
 
 ORACLE_DB_FILE_1=/data/linux.x64_11gR2_database_1of2.zip
 ORACLE_DB_FILE_2=/data/linux.x64_11gR2_database_2of2.zip
@@ -38,7 +38,7 @@ done
 
 echo "Remove oracle"
 userdel -r $ORACLE_USER &>/dev/null
-[ -f $ORACLE_ORATAB ] && sed -c -i "s/^$ORACLE_SID.*//" $ORACLE_ORATAB
+[ -f $ORACLE_ORATAB ] && sed -c -i "s/^$ORACLE_SID.*\n//" $ORACLE_ORATAB
 
 echo "Download wget, zip, unzip, rlwrap"
 yum -q list installed wget &>/dev/null && echo "wget was installed" || yum install -y wget 
@@ -119,7 +119,7 @@ export CLASSPATH=$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib;
 su $ORACLE_USER -c "echo \"$ORACLE_DB_SETTING\" >> ~/.bash_profile"
 cp -rf $ORACLE_RESPONSEFILE /tmp
 
-echo "# After running successfully, running commands below:
+echo "# After running successfully, run below command with oracle user: 
 $STAGE_DIR/database/runInstaller -ignoreSysPrereqs -ignorePrereq -waitforcompletion -silent -responseFile /tmp/$(basename $ORACLE_RESPONSEFILE)
 " > ~/$(basename "$0").log
 echo "Using GUI to install or see log ~/$(basename "$0").log for next silent installation."
