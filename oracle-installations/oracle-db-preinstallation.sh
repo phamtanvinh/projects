@@ -26,10 +26,11 @@ ORACLE_RESPONSEFILE='./db11R2.rsp'
 echo "Remove oracle"
 userdel -r oracle &>/dev/null
 
-echo "Download wget, zip, unzip"
+echo "Download wget, zip, unzip, rlwrap"
 yum -q list installed wget &>/dev/null && echo "wget was installed" || yum install -y wget 
 yum -q list installed zip &>/dev/null && echo "zip was installed" || yum install -y zip 
 yum -q list installed unzip &>/dev/null && echo "unzip was installed" || yum install -y unzip 
+yum -q list installed rlwrap &>/dev/null && echo "rlwrap was installed" || yum install -y rlwrap 
 
 echo "Get repo..."
 wget https://public-yum.oracle.com/public-yum-ol6.repo -O /etc/yum.repos.d/public-yum-ol6.repo &>/dev/null
@@ -73,7 +74,7 @@ echo "Open port for oracle db"
 
 cp $CONFIG_IPTABLE_FILE $CONFIG_IPTABLE_FILE.$(date +%s)
 
-for PORT in ${ORACLE_PORTS[@]}
+for PORT in ${ORACLE_PORTS[@]};
 do
     TMP_ADD_PORT="-A INPUT -m state --state NEW -m tcp -p tcp --dport $PORT -j ACCEPT"
     grep -- "-A INPUT.*-dport $PORT.*-j ACCEPT" $CONFIG_IPTABLE_FILE &>/dev/null || sed -c -i "0,/$TMP/s/$TMP/$TMP\n$TMP_ADD_PORT/" $CONFIG_IPTABLE_FILE
