@@ -27,7 +27,7 @@ ORACLE_RESPONSEFILE='db11R2.rsp'
 [ $(id -u $ORACLE_USER 2>/dev/null) ] && echo "User oracle was installed." &&
 while true; do
 
-    read -p "Do you wish to install this program?" yn
+    read -p "Do you wish to install this program?[y|n]" yn
     case $yn in
         [Yy]* ) break;;
         [Nn]* ) exit;;
@@ -127,6 +127,6 @@ Reboot after 5s"
 sleep 5
 
 echo "Checking SELinux..."
-grep 'SELINUX=permissive' /etc/sysconfig/selinux &>/dev/null && echo "Have set permissive" || sed -c -i "s/^\(SELINUX=\).*/\1$SELINUX_STATUS/" $CONFIG_SELINUX_FILE; reboot
+grep 'SELINUX=permissive' /etc/sysconfig/selinux 2&>/dev/null && echo "Have set permissive" || sed -c -i "s/^\(SELINUX=\).*/\1$SELINUX_STATUS/" $CONFIG_SELINUX_FILE; reboot
 
 
