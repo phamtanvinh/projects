@@ -42,7 +42,7 @@ done
 
 echo "Remove oracle"
 userdel -r $ORACLE_USER &>/dev/null
-[ -f $ORACLE_ORATAB ] && sed -c -i "s/^$ORACLE_SID.*\n//" $ORACLE_ORATAB
+[ -f $ORACLE_ORATAB ] && sed -c -i "s/^$ORACLE_SID.*//" $ORACLE_ORATAB
 
 echo "Download wget, zip, unzip, rlwrap"
 yum -q list installed wget &>/dev/null && echo "wget was installed" || yum install -y wget 
