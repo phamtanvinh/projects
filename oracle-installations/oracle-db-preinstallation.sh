@@ -16,6 +16,7 @@ ORACLE_DB_DIR='/u01'
 ORACLE_BASE="$ORACLE_DB_DIR/app/oracle"
 ORACLE_HOME="$ORACLE_BASE/product/$ORACLE_VER/dbhome"
 ORACLE_PORTS=('1158' '1521')
+ORACLE_ORATAB=/ect/oratab
 
 ORACLE_DB_FILE_1=/data/linux.x64_11gR2_database_1of2.zip
 ORACLE_DB_FILE_2=/data/linux.x64_11gR2_database_2of2.zip
@@ -23,6 +24,7 @@ ORACLE_RESPONSEFILE='db11R2.rsp'
 
 echo "Remove oracle"
 userdel -r oracle &>/dev/null
+[ -f $ORACLE_ORATAB ] && sed -c -i "s/^$ORACLE_SID.*//" $ORACLE_ORATAB
 
 echo "Download wget, zip, unzip, rlwrap"
 yum -q list installed wget &>/dev/null && echo "wget was installed" || yum install -y wget 
@@ -52,9 +54,6 @@ echo "Oracle user setting..."
 echo "oracle:$ORACLE_PASSWORD" | chpasswd
 
 echo "* - nproc 16384" >> /etc/security/limits.d/90-nproc.conf
-
-echo "Setting SELinux..."
-sed -c -i "s/^\(SELINUX=\).*/\1$SELINUX_STATUS/" $CONFIG_SELINUX_FILE
 
 echo "Create directory"
 rm -rf $ORACLE_DB_DIR
@@ -107,10 +106,14 @@ su oracle -c "echo \"$ORACLE_DB_SETTING\" >> ~/.bash_profile"
 cp -rf $(readlink -f $ORACLE_RESPONSEFILE) /tmp
 
 echo "# After running successfully, running commands below:
-$STAGE_DIR/database/runInstaller -ignoreSysPrereqs -ignorePrereq -waitforcompletion -silent -responseFile /tmp/$(basename $ORACLE_RESPONSEFILE)∏
+$STAGE_DIR/database/runInstaller -ignoreSysPrereqs -ignorePrereq -waitforcompletion -silent -responseFile /tmp/$(basename $ORACLE_RESPONSEFILE)
 " > ~/$(basename "$0").log
 echo "Using GUI to install or see log ~/$(basename "$0").log for next silent installation.
 Reboot after 5s"
 
 sleep 5
-reboot
+
+echo "Checking SELinux..."
+grep 'SELINUX=permissive' /etc/sysconfig/selinux &>/dev/null && echo "Have set permissive" || sed -c -i "s/^\(SELINUX=\).*/\1$SELINUX_STATUS/" $CONFIG_SELINUX_FILE; reboot
+
+
