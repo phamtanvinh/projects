@@ -19,7 +19,7 @@ ORACLE_PORTS=('1158' '1521')
 
 ORACLE_DB_FILE_1=/data/linux.x64_11gR2_database_1of2.zip
 ORACLE_DB_FILE_2=/data/linux.x64_11gR2_database_2of2.zip
-ORACLE_RESPONSEFILE='./db11R2.rsp'
+ORACLE_RESPONSEFILE='db11R2.rsp'
 
 echo "Remove oracle"
 userdel -r oracle &>/dev/null
