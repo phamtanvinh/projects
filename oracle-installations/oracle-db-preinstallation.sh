@@ -144,4 +144,5 @@ else
     reboot
 fi
 
+# Exception in thread "main" java.lang.NoClassDefFoundError
 su - $ORACLE_USER -c "$STAGE_DIR/database/runInstaller -ignoreSysPrereqs -ignorePrereq -waitforcompletion -silent -responseFile /tmp/$(basename $ORACLE_RESPONSEFILE)"
