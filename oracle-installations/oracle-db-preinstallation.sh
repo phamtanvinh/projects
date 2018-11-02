@@ -32,7 +32,7 @@ ORACLE_ORATAB=/etc/oratab
 
 ORACLE_DB_FILE_1=/data/linux.x64_11gR2_database_1of2.zip
 ORACLE_DB_FILE_2=/data/linux.x64_11gR2_database_2of2.zip
-ORACLE_DB_FILES=( $ORACLE_DB_FILE1 $ORACLE_DB_FILE2 )
+ORACLE_DB_FILES=( /data/linux.x64_11gR2_database_1of2.zip /data/linux.x64_11gR2_database_2of2.zip )
 ORACLE_RESPONSEFILE=$SCRIPT_DIR/db11R2.rsp
 
 id -u $ORACLE_USER &>/dev/null && echo "User oracle was installed." &&
