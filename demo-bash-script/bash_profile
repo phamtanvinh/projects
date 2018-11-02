@@ -1,0 +1,14 @@
+# .bash_profile
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+	. ~/.bashrc
+fi
+
+# User specific environment and startup programs
+
+PATH=$PATH:$HOME/bin
+
+export PATH
+export GREP_OPTIONS='--color=always'
+export GREP_COLOR='1;35;40'
