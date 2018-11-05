@@ -1,5 +1,5 @@
-{ command1; command2; } sequence command
-$( command1; commnd2 ) subcommand, old style \`\`
+{ cmd1; cmd2; } ( cmd1; cmd2; ) $(cmd) \`cmd\` command
+tee
+$?
 
-tee > file folk output stream
-$? return already execute command
+[ condition ] vs [[ condition ]]

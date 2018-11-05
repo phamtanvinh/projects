@@ -50,7 +50,7 @@ echo "Remove oracle"
 userdel -r $ORACLE_USER &>/dev/null
 
 echo "Remove Oracle SID on $ORACLE_ORATAB"
-[ -f $ORACLE_ORATAB ] && sed -c -i "s/^$ORACLE_SID.*$ORACLE_DB_HOME.*//" $ORACLE_ORATAB
+[[ -f $ORACLE_ORATAB ]] && sed -c -i "s/^$ORACLE_SID.*$ORACLE_DB_HOME.*//" $ORACLE_ORATAB
 
 echo "Download wget, zip, unzip, rlwrap"
 yum -q list installed wget &>/dev/null && echo "wget was installed" || yum install -y wget 
@@ -137,7 +137,7 @@ echo "Using GUI to install or see log ~/$(basename "$0").log for next silent ins
 
 echo "Checking SELinux..."
 grep 'SELINUX=permissive' /etc/sysconfig/selinux &>/dev/null
-if [ $? ]; then 
+if [[ $? ]]; then 
     echo "Have set permissive"
 else 
     sed -c -i "s/^\(SELINUX=\).*/\1$SELINUX_STATUS/" $CONFIG_SELINUX_FILE 
