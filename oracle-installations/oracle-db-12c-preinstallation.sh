@@ -55,6 +55,7 @@ yum clean metadata > /dev/null
 
 echo 'Install oracle-rdbms-server-12cR1-preinstall ...'
 
+yum remove -y oracle-rdbms-server-12cR1-preinstall &> /dev/null
 yum install -y oracle-rdbms-server-12cR1-preinstall
 
 # Config selinux
