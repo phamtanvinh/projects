@@ -1,0 +1,12 @@
+GROUP_LIST=(
+  'Development Tools'
+)
+
+PACKAGE_LIST=(
+  epel-release
+  wget
+  git
+  zip
+  unzip
+  rlwrap
+)

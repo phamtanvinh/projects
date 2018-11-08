@@ -1,6 +1,0 @@
-epel-release
-wget
-git
-zip
-unzip
-rlwrap
