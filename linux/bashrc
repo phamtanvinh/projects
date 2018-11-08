@@ -11,12 +11,12 @@ if [ -f /etc/bashrc ]; then
 	. /etc/bashrc
 fi
 
-gitpush(){
+gitpush(){(
   cd ~/projects
   git pull
   git add -A
-  COMMENT=${1:-(date +"[%Y-%m-%d %H:%M] $HOSTNAME $USER: push code")}
+  COMMENT=(date +"[%Y-%m-%d %H:%M] $HOSTNAME $USER: ${1:-push code}")
   git commit -m "$COMMENT"
   git push
-}
+)}
 
