@@ -1,9 +1,10 @@
-GIT_ENV='../config/git_env'
+GIT_VERSION="${1:=2.9.5}"
+GIT_ENV_FILE="../config/git-$GIT_VERSION"
 
-if [[ -f "$GIT_ENV" ]]; then 
-  source "$GIT_ENV"
+if [[ -f "$GIT_ENV_FILE" ]]; then 
+  source "$GIT_ENV_FILE"
 else
-  echo "$GIT_ENV not found"
+  echo "$GIT_ENV_FILE not found"
   exit 1
 fi
 
