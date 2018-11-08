@@ -1,5 +1,6 @@
-GIT_VERSION="${1:=2.9.5}"
-GIT_ENV_FILE="../config/git-$GIT_VERSION"
+BASE_DIR="$(dirname ${BASH_SOURCE[0]})"
+GIT_VERSION="${1:-2.9.5}"
+GIT_ENV_FILE="$BASE_DIR/../config/git/git-$GIT_VERSION"
 
 if [[ -f "$GIT_ENV_FILE" ]]; then 
   source "$GIT_ENV_FILE"
