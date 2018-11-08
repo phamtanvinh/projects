@@ -1,9 +1,10 @@
+GIT_SOURCE='https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.9.5.tar.gz'
 yum install -y curl-devel expat-devel gettext-devel openssl-devel zlib-devel perl-ExtUtils-MakeMaker
 (
     rm -rf /usr/local/git
     sed -ci 's/.*\(\/usr\/local\/git\/bin\).*//' /etc/bashrc
     cd /tmp
-    wget https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.9.5.tar.gz
+    wget $GIT_SOURCE
     tar xzf git-2.9.5.tar.gz
     cd git-2.9.5
     make prefix=/usr/local/git all
