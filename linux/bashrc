@@ -15,7 +15,7 @@ gitpush(){(
   cd ~/projects
   git pull
   git add -A
-  COMMENT=(date +"[%Y-%m-%d %H:%M] $HOSTNAME $USER: ${1:-push code}")
+  COMMENT=$(date +"[%Y-%m-%d %H:%M] $HOSTNAME $USER: ${1:-push code}")
   git commit -m "$COMMENT"
   git push
 )}
