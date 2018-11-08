@@ -11,4 +11,10 @@ if [ -f /etc/bashrc ]; then
 	. /etc/bashrc
 fi
 
-alias gitpush="(cd ~/projects; git pull; git add -A; git commit -am'push code'; git push)"
+alias gitpush=(
+  cd ~/projects
+  git pull
+  git add -A
+  git commit -am $(date +"[%Y-%m-%d %H:%M] $USER: push code")
+  git push
+)
