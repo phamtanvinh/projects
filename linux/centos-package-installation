@@ -1,0 +1,4 @@
+epel-release
+wget
+zip
+unzip
