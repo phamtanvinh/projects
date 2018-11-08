@@ -9,4 +9,5 @@ PACKAGE_LIST=(
   zip
   unzip
   rlwrap
+  vim
 )
