@@ -1,5 +1,5 @@
 yum install -y curl-devel expat-devel gettext-devel openssl-devel zlib-devel perl-ExtUtils-MakeMaker
-$(
+(
     rm -rf /usr/local/git
     sed -ci 's/.*\(\/usr\/local\/git\/bin\).*//' /etc/bashrc
     cd /tmp
