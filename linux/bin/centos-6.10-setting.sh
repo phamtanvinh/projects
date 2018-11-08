@@ -1,6 +1,6 @@
 BASE_DIR="$(dirname ${BASH_SOURCE[0]})"
 CENTOS_VERSION='6.10'
-CENTOS_PACKAGE_LIST="$BASE_DIR../config/centos/centos-$CENTOS_VERSION-package-list"
+CENTOS_PACKAGE_LIST="$BASE_DIR/../config/centos/centos-$CENTOS_VERSION-package-list"
 
 if [[ -f "$CENTOS_PACKAGE_LIST" ]]; then
   source "$CENTOS_PACKAGE_LIST"
