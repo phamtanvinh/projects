@@ -2,3 +2,4 @@ epel-release
 wget
 zip
 unzip
+rlwrap
