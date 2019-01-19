@@ -1,0 +1,7 @@
+# Fix ModuleNotFoundError: No module named '_ctypes'
+yum install libffi-devel
+
+# Fix 
+# Modules/errors.h:8:18: fatal error: lber.h: No such file or directory
+# error: command 'gcc' failed with exit status 1
+yum -y install openldap-devel

@@ -1,0 +1,3 @@
+# on Centos Requirement
+yum install gcc-c++ 
+yum -y install openldap-devel

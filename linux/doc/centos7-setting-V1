@@ -1,0 +1,14 @@
+yum update
+yum clean
+yum upgrade
+yum install dkms
+yum groupinstall "Development Tools"
+yum install kernel-devel
+
+# Install VBOXADDITIONS
+# Insert Guest Additions
+mkdir /media/cdrom
+mount -r /dev/cdrom /media/cdrom 
+
+
+yum install -y nano wget curl net-tools lsof bash-completion iptables-services

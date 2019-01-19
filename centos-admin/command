@@ -1,0 +1,10 @@
+centos admin
+
+time
+- chronyd
+- ntpd
+- timedatectl
+
+network
+- nmcli
+- nmtui

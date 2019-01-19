@@ -1,0 +1,10 @@
+
+vi ~/.bash_profile
+export ORACLE_SID=Kitet
+export ORAENV_ASK=NO
+export NLS_LANG=POLISH_POLAND.AL32UTF8
+unicode_start
+. /usr/local/bin/oraenv
+
+### run after
+/u01/app/oracle/product/12.2.0/dbhome_1/bin/dbstart $ORACLE_HOME

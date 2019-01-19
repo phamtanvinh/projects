@@ -1,0 +1,13 @@
+# Setting Python
+
+brew install virtualenv python-pip libpq-dev python-dev
+
+# Setting Odoo
+brew install postgresql
+brew install node
+npm install -g less
+brew install freetype jpeg libpng libtiff webp xz
+brew install Caskroom/cask/wkhtmltopdf
+pip3 install Pillow
+
+
