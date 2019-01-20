@@ -1,4 +1,5 @@
 create or replace package APP_CONFIG_UTIL
+authid current_user
 as
     g_config_default    JSON_OBJECT_T   := app_meta_data_util.g_config_default;
     g_app_config        APP_CONFIG      := new APP_CONFIG();

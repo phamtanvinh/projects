@@ -32,6 +32,10 @@ as
 -- feature: manipulate table
     function exist_table(pi_table_name VARCHAR2) return BOOLEAN;
     procedure drop_table(pi_table_name VARCHAR2, pi_is_forced BOOLEAN default false);
+-- feature: manipulate date and time
+    function get_dnum(pi_ts TIMESTAMP default current_timestamp) return NUMBER;
+    function get_tnum(pi_ts TIMESTAMP default current_timestamp) return NUMBER;
+    function get_unix_ts(pi_ts TIMESTAMP default current_timestamp) return NUMBER;
 end APP_UTIL;
 /
 
@@ -136,10 +140,27 @@ as
     begin
         if exist_table(pi_table_name) and pi_is_forced
         then
-            execute immediate 'drop table ' || pi_table_name || ' purge';
+            execute immediate 'DROP TABLE ' || pi_table_name || ' CASCADE CONSTRAINTS PURGE';
         end if;
           
     end;
-
+-- feature: manipulate date and time
+    function get_dnum(pi_ts TIMESTAMP default current_timestamp) return NUMBER
+    is
+    begin
+        return to_number(to_char(pi_ts, 'YYYYMMDD'));
+    end;
+    
+    function get_tnum(pi_ts TIMESTAMP default current_timestamp) return NUMBER
+    is
+    begin
+        return to_number(to_char(pi_ts, 'HH24MISS'));
+    end;
+    
+    function get_unix_ts(pi_ts TIMESTAMP default current_timestamp) return NUMBER
+    is
+    begin
+        return round((cast(pi_ts AS DATE) - DATE '1970-01-01')*24*60*60);
+    end;
 end APP_UTIL;
 /

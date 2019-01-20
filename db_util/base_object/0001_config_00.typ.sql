@@ -36,7 +36,7 @@ under APP_BASE_OBJECT(
         pi_status           VARCHAR2        default null
     )
 -- manipulate
-);
+) not final;
 /
 
 create or replace type body APP_CONFIG

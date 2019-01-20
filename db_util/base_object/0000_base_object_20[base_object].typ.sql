@@ -1,3 +1,9 @@
+/* **********************************************************************************
+** APP_BASE_OBJECT
+** **********************************************************************************
+**  Description: this is abstractive object for custom type to inheriate
+**  Template:
+** **********************************************************************************/
 create or replace type APP_BASE_OBJECT force
 as object(
     "__name__"          VARCHAR2(64),
@@ -48,8 +54,8 @@ as
     )
     is
     begin
-        "__name__"          := pi_name;
         "__attributes__"    := new JSON_OBJECT_T();
+        "__name__"          := pi_name;
         description         := pi_description;
         created_date        := sysdate;
         update_all();
