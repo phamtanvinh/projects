@@ -22,6 +22,7 @@ as object(
     ),
     member procedure get_attributes_info,
     member procedure print_attributes_info,
+    member procedure print_attributes_info(pi_is_sorted BOOLEAN),
 -- manipulate
     member procedure update_all
 ) not final;
@@ -41,6 +42,7 @@ as
     member procedure get_attributes_info
     is
     begin
+        "__attributes__"    := new JSON_OBJECT_T();
         "__attributes__".put('__name__'     ,"__name__");
         "__attributes__".put('__ts__'       ,"__ts__");
         "__attributes__".put('description'  ,description);
@@ -54,7 +56,6 @@ as
     )
     is
     begin
-        "__attributes__"    := new JSON_OBJECT_T();
         "__name__"          := pi_name;
         description         := pi_description;
         created_date        := sysdate;
@@ -66,8 +67,17 @@ as
         l_string        VARCHAR2(4000);
     begin
         get_attributes_info();
-        l_string    := APP_UTIL.get_string_format(pi_jo => "__attributes__");
+        l_string    := app_util.get_string_format(pi_jo => "__attributes__");
         dbms_output.put_line(l_string);
+    end;
+
+    member procedure print_attributes_info(pi_is_sorted BOOLEAN)
+    is
+        l_dictionary    app_util.DICTIONARY;
+    begin
+        get_attributes_info();
+        l_dictionary := app_util.get_dictionary("__attributes__");
+        app_util.print_string_format(l_dictionary);
     end;
 
 -- manipulate

@@ -36,6 +36,9 @@ as
     function get_dnum(pi_ts TIMESTAMP default current_timestamp) return NUMBER;
     function get_tnum(pi_ts TIMESTAMP default current_timestamp) return NUMBER;
     function get_unix_ts(pi_ts TIMESTAMP default current_timestamp) return NUMBER;
+-- feature: manipulate dictionary
+    function get_dictionary(pi_json    JSON_OBJECT_T) return DICTIONARY;
+
 end APP_UTIL;
 /
 
@@ -161,6 +164,19 @@ as
     is
     begin
         return round((cast(pi_ts AS DATE) - DATE '1970-01-01')*24*60*60);
+    end;
+-- feature: manipulate dictionary
+    function get_dictionary(pi_json    JSON_OBJECT_T) return DICTIONARY
+    is
+        l_keys          JSON_KEY_LIST := pi_json.get_keys();
+        l_dictionary    DICTIONARY;
+    begin
+        for i in 1..l_keys.count
+        loop
+            l_dictionary(l_keys(i)) := pi_json.get_string(l_keys(i));
+        end loop;
+
+        return l_dictionary;
     end;
 end APP_UTIL;
 /
