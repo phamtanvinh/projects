@@ -1,0 +1,4 @@
+systemctl disable firewalld
+yum install iptables-services
+systemctl enable iptables
+service iptables save

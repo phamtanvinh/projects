@@ -1,0 +1,21 @@
+yum install git wget zip unzip
+
+yum install gcc kernel-devel make -y bzip2 tar net-tools
+
+yum install -y iptables-services
+
+# Mount the ISO image with the guest additions
+mkdir /cdrom
+mount /dev/cddrom /cdrom
+/cdrom/VBoxLinuxAdditions.run
+
+
+# Postgresql installation
+yum install zlib-devel readline-devel
+
+yum install -y openssl-devel bzip2-devel
+
+/etc/group
+vboxsf:x:999:postgres
+
+ netstat -apn | grep -i [pid]

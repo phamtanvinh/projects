@@ -1,0 +1,1 @@
+yum install -y xorg-x11-xauth
