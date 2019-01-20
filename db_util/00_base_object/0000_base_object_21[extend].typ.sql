@@ -29,11 +29,11 @@ under APP_BASE_OBJECT(
         pi_mode             VARCHAR2    default null),
 
     member procedure get_datetime_dim(
-        pio_ts          in out TIMESTAMP,
-        pio_dnum        in out NUMBER,
-        pio_tnum        in out NUMBER,
-        pio_unix_ts     in out NUMBER,
-        pio_date        in out DATE),
+        pio_ts              in out TIMESTAMP,
+        pio_dnum            in out NUMBER,
+        pio_tnum            in out NUMBER,
+        pio_unix_ts         in out NUMBER,
+        pio_date            in out DATE),
 
     overriding member procedure get_attributes_info,
 -- manipulate
@@ -76,11 +76,11 @@ as
     end;
 
     member procedure get_datetime_dim(
-        pio_ts          in out TIMESTAMP,
-        pio_dnum        in out NUMBER,
-        pio_tnum        in out NUMBER,
-        pio_unix_ts     in out NUMBER,
-        pio_date        in out DATE
+        pio_ts              in out TIMESTAMP,
+        pio_dnum            in out NUMBER,
+        pio_tnum            in out NUMBER,
+        pio_unix_ts         in out NUMBER,
+        pio_date            in out DATE
     )
     is
     begin
