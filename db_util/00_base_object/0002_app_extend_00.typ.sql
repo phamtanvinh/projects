@@ -9,6 +9,7 @@ create or replace type APP_EXTEND force
 under APP_BASE_OBJECT(
     "__code__"          VARCHAR2(64),
     "__mode__"          VARCHAR2(64),
+    "__config_value__"  VARCHAR2(4000),
     created_ts          TIMESTAMP,
     created_dnum        NUMBER,
     created_tnum        NUMBER,
@@ -98,6 +99,7 @@ as
         (self as APP_BASE_OBJECT).get_attributes_info();
         "__attributes__".put('__code__'         ,"__code__");
         "__attributes__".put('__mode__'         ,"__mode__");
+        "__attributes__".put('__config_value__' ,"__config_value__");
         "__attributes__".put('created_ts'       ,created_ts);
         "__attributes__".put('created_dnum'     ,created_dnum);
         "__attributes__".put('created_tnum'     ,created_tnum);

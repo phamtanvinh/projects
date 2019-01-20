@@ -21,6 +21,12 @@ under APP_EXTEND(
 -- static
 -- constructor
     constructor function APP_LOGGER return self as result,
+    constructor function APP_LOGGER(
+        pi_transaction_code     VARCHAR2,
+        pi_app_user             VARCHAR2,
+        pi_unit_name            VARCHAR2,
+        pi_unit_type            VARCHAR2
+    ) return self as result,
 -- initialize
     member procedure initialize(
         pi_name                 VARCHAR2    default null,
@@ -66,6 +72,25 @@ as
         );
         return;
     end;
+    constructor function APP_LOGGER(
+        pi_transaction_code     VARCHAR2,
+        pi_app_user             VARCHAR2,
+        pi_unit_name            VARCHAR2,
+        pi_unit_type            VARCHAR2
+    ) return self as result
+    is
+    begin
+        initialize(
+            pi_name                 => 'APP_LOGGER',
+            pi_transaction_code     => pi_transaction_code,
+            pi_app_user             => pi_app_user,
+            pi_unit_name            => pi_unit_name,
+            pi_unit_type            => pi_unit_type,
+            pi_log_step_name        => '000',
+            pi_log_step_description => 'Initialize logger'
+        );
+        return;
+    end;
 -- initialize
     member procedure initialize(
         pi_name                 VARCHAR2    default null,
@@ -86,6 +111,7 @@ as
             pi_description      => pi_description,
             pi_code             => pi_code,
             pi_mode             => pi_mode);
+        app_user        := pi_app_user;
         set_transaction(pi_transaction_code     => pi_transaction_code);
         set_log_step(
             pi_log_step_name            => pi_log_step_name,
