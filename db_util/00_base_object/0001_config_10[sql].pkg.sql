@@ -65,16 +65,16 @@ as
     begin
         l_sql := '
             SELECT 
-                    CONFIG_ID,
-                    CONFIG_CODE,
-                    CONFIG_USER,
-                    CONFIG_NAME,
-                    CONFIG_VALUE,
-                    CONFIG_TYPE,
-                    DESCRIPTION,
-                    STATUS,
-                    CREATED_DATE,
-                    UPDATED_DATE
+                CONFIG_ID,
+                CONFIG_CODE,
+                CONFIG_USER,
+                CONFIG_NAME,
+                CONFIG_VALUE,
+                CONFIG_TYPE,
+                DESCRIPTION,
+                STATUS,
+                CREATED_DATE,
+                UPDATED_DATE
             FROM '||pi_table_name||'
             WHERE 1 = 1
                 AND (CONFIG_ID  = :pi_config_id OR CONFIG_CODE = :pi_config_code)

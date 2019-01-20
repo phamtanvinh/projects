@@ -30,6 +30,7 @@ as
         execute immediate l_sql;
         dbms_output.put_line('Done.');
     end;
+
     procedure insert_config
     is
         l_table_name        VARCHAR2(64)    := g_config_default.get_string('table_name');
@@ -51,6 +52,7 @@ as
                 g_app_config.created_date,
                 g_app_config.updated_date;
     end;
+
     procedure get_config(
         pi_config_id        VARCHAR2 default null,
         pi_config_code      VARCHAR2 default null,
