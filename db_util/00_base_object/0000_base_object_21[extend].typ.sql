@@ -1,3 +1,10 @@
+/* **********************************************************************************
+** APP_EXTEND
+** **********************************************************************************
+**  Description: this is extend object of base object for some config and auto update
+**      date time methods
+**  Template:
+** **********************************************************************************/
 create or replace type APP_EXTEND force
 under APP_BASE_OBJECT(
     "__code__"          VARCHAR2(64),
@@ -15,17 +22,19 @@ under APP_BASE_OBJECT(
 -- constructor
     constructor function APP_EXTEND return self as result,
 -- initialize
+    member procedure initialize(
+        pi_name             VARCHAR2    default null,
+        pi_description      VARCHAR2    default null,
+        pi_code             VARCHAR2    default null,
+        pi_mode             VARCHAR2    default null),
+
     member procedure get_datetime_dim(
         pio_ts          in out TIMESTAMP,
         pio_dnum        in out NUMBER,
         pio_tnum        in out NUMBER,
         pio_unix_ts     in out NUMBER,
         pio_date        in out DATE),
-    member procedure initialize(
-        pi_name             VARCHAR2    default null,
-        pi_description      VARCHAR2    default null,
-        pi_code             VARCHAR2    default null,
-        pi_mode             VARCHAR2    default null),
+
     overriding member procedure get_attributes_info,
 -- manipulate
     member procedure get_created_datetime_dim,
@@ -48,22 +57,6 @@ as
         return;
     end;
 -- initialize
-    member procedure get_datetime_dim(
-        pio_ts          in out TIMESTAMP,
-        pio_dnum        in out NUMBER,
-        pio_tnum        in out NUMBER,
-        pio_unix_ts     in out NUMBER,
-        pio_date        in out DATE
-    )
-    is
-    begin
-        pio_ts          := current_timestamp;
-        pio_dnum        := app_util.get_dnum(pio_ts);
-        pio_tnum        := app_util.get_tnum(pio_ts);
-        pio_unix_ts     := app_util.get_unix_ts(pio_ts);
-        pio_date        := cast(pio_ts as DATE);
-
-    end;
     member procedure initialize(
         pi_name             VARCHAR2    default null,
         pi_description      VARCHAR2    default null,
@@ -81,6 +74,24 @@ as
         get_updated_datetime_dim();
         get_duration();
     end;
+
+    member procedure get_datetime_dim(
+        pio_ts          in out TIMESTAMP,
+        pio_dnum        in out NUMBER,
+        pio_tnum        in out NUMBER,
+        pio_unix_ts     in out NUMBER,
+        pio_date        in out DATE
+    )
+    is
+    begin
+        pio_ts          := current_timestamp;
+        pio_dnum        := app_util.get_dnum(pio_ts);
+        pio_tnum        := app_util.get_tnum(pio_ts);
+        pio_unix_ts     := app_util.get_unix_ts(pio_ts);
+        pio_date        := cast(pio_ts as DATE);
+
+    end;
+
     overriding member procedure get_attributes_info
     is
     begin
@@ -131,6 +142,7 @@ as
     overriding member procedure update_all
     is
     begin
+        (self as APP_BASE_OBJECT).update_all();
         get_duration();
         get_updated_datetime_dim();
     end;
