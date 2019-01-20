@@ -36,6 +36,7 @@ as
     is
     begin
         self.initialize(pi_name => 'APP_BASE_OBJECT');
+        update_all();
         return;
     end;
 -- initialize
@@ -57,18 +58,16 @@ as
     is
     begin
         "__name__"          := pi_name;
+        "__ts__"            := current_timestamp;
         description         := pi_description;
         created_date        := sysdate;
-        update_all();
     end;
 
     member procedure print_attributes_info
     is
-        l_string        VARCHAR2(4000);
     begin
         get_attributes_info();
-        l_string    := app_util.get_string_format(pi_jo => "__attributes__");
-        dbms_output.put_line(l_string);
+        app_util.print_string_format("__attributes__");
     end;
 
     member procedure print_attributes_info(pi_is_sorted BOOLEAN)
@@ -85,7 +84,6 @@ as
     member procedure update_all
     is
     begin
-        "__ts__"            := current_timestamp;
         updated_date        := sysdate;
     end;
 end;

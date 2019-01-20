@@ -72,13 +72,14 @@ as
     )
     is
     begin
-        "__attributes__"    := new JSON_OBJECT_T();
-        "__name__"          := pi_name;
+        (self as APP_BASE_OBJECT).initialize(
+            pi_name => pi_name, 
+            pi_description => pi_description);
         "__code__"          := pi_code;
         "__mode__"          := pi_mode;
-        description         := pi_description;
         get_created_datetime_dim();
-        update_all();
+        get_updated_datetime_dim();
+        get_duration();
     end;
     overriding member procedure get_attributes_info
     is
