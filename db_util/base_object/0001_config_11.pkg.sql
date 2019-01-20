@@ -39,16 +39,16 @@ as
         --dbms_output.put_line(l_sql);
         execute immediate l_sql
             using
-                APP_CONFIG_UTIL.g_app_config.CONFIG_ID,
-                APP_CONFIG_UTIL.g_app_config.CONFIG_CODE,
-                APP_CONFIG_UTIL.g_app_config.CONFIG_USER,
-                APP_CONFIG_UTIL.g_app_config.CONFIG_NAME,
-                APP_CONFIG_UTIL.g_app_config.CONFIG_VALUE.to_string,
-                APP_CONFIG_UTIL.g_app_config.CONFIG_TYPE,
-                APP_CONFIG_UTIL.g_app_config.DESCRIPTION,
-                APP_CONFIG_UTIL.g_app_config.STATUS,
-                APP_CONFIG_UTIL.g_app_config.CREATED_DATE,
-                APP_CONFIG_UTIL.g_app_config.UPDATED_DATE;
+                g_app_config.config_id,
+                g_app_config.config_code,
+                g_app_config.config_user,
+                g_app_config.config_name,
+                g_app_config.config_value.to_string,
+                g_app_config.config_type,
+                g_app_config.description,
+                g_app_config.status,
+                g_app_config.created_date,
+                g_app_config.updated_date;
     end;
     procedure get_config(
         pi_config_id        VARCHAR2 default null,
@@ -65,18 +65,18 @@ as
         l_sql           := app_config_sql.get_config_sql(l_table_name);
         execute immediate l_sql 
             into 
-                    APP_CONFIG_UTIL.g_app_config.CONFIG_ID,
-                    APP_CONFIG_UTIL.g_app_config.CONFIG_CODE,
-                    APP_CONFIG_UTIL.g_app_config.CONFIG_USER,
-                    APP_CONFIG_UTIL.g_app_config.CONFIG_NAME,
-                    l_config_value,
-                    APP_CONFIG_UTIL.g_app_config.CONFIG_TYPE,
-                    APP_CONFIG_UTIL.g_app_config.DESCRIPTION,
-                    APP_CONFIG_UTIL.g_app_config.STATUS,
-                    APP_CONFIG_UTIL.g_app_config.CREATED_DATE,
-                    APP_CONFIG_UTIL.g_app_config.UPDATED_DATE 
+                g_app_config.config_id,
+                g_app_config.config_code,
+                g_app_config.config_user,
+                g_app_config.config_name,
+                l_config_value,
+                g_app_config.config_type,
+                g_app_config.description,
+                g_app_config.status,
+                g_app_config.created_date,
+                g_app_config.updated_date 
             using pi_config_id, pi_config_code, pi_config_name, pi_status;
-        APP_CONFIG_UTIL.g_app_config.CONFIG_VALUE := JSON_OBJECT_T(l_config_value);
+        g_app_config.config_value := JSON_OBJECT_T(l_config_value);
     end;
 end APP_CONFIG_UTIL;
 /
