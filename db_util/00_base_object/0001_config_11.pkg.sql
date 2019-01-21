@@ -55,8 +55,8 @@ as
         g_app_config            := nvl(pi_app_config, g_app_config);
         g_config_id			    := g_app_config.config_id;
         g_config_code		 	:= g_app_config.config_code;
-        g_config_name			:= g_app_config.config_user;
-        g_config_user			:= g_app_config.config_name;
+        g_config_name			:= g_app_config.config_name;
+        g_config_user			:= g_app_config.config_user;
         g_config_value			:= g_app_config.config_value.to_string;
         g_config_type			:= g_app_config.config_type;
         g_description			:= g_app_config.description;
@@ -71,8 +71,8 @@ as
         g_app_config                        := new APP_CONFIG();
         g_app_config.config_id              := g_config_id;
         g_app_config.config_code			:= g_config_code;
-        g_app_config.config_user			:= g_config_name;
-        g_app_config.config_name			:= g_config_user;
+        g_app_config.config_user			:= g_config_user;
+        g_app_config.config_name			:= g_config_name;
         g_app_config.config_value           := JSON_OBJECT_T(g_config_value);
         g_app_config.config_type			:= g_config_type;
         g_app_config.description			:= g_description;
@@ -129,6 +129,7 @@ as
     begin
         refresh_config();
         l_sql   := app_config_sql.get_config_sql();
+        --dbms_output.put_line(l_sql);
         execute immediate l_sql 
             into 
                 g_config_id,

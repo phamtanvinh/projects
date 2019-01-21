@@ -50,6 +50,7 @@ as
     begin
         update_config();
         l_sql   := '
+        BEGIN
             INSERT INTO '|| g_table_name ||'(
                 CONFIG_ID,
                 CONFIG_CODE,
@@ -72,7 +73,9 @@ as
                 :STATUS,
                 :CREATED_DATE,
                 :UPDATED_DATE
-            )';
+            );
+            COMMIT;
+        END;';
         return l_sql;
     end;
     function get_config_sql return VARCHAR2
