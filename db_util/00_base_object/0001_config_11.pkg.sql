@@ -8,6 +8,13 @@ as
         pi_config_code      VARCHAR2 default null,
         pi_config_name      VARCHAR2 default null,
         pi_status           VARCHAR2 default 'ACTIVE'
+    );    
+    procedure get_config(
+        pi_config_id        VARCHAR2 default null,
+        pi_config_code      VARCHAR2 default null,
+        pi_config_name      VARCHAR2 default null,
+        pi_status           VARCHAR2 default 'ACTIVE',
+        po_app_config       out APP_CONFIG
     );
     procedure initialize;
     procedure insert_config;
@@ -80,6 +87,23 @@ as
                 g_app_config.updated_date 
             using pi_config_id, pi_config_code, pi_config_name, pi_status;
         g_app_config.config_value := JSON_OBJECT_T(l_config_value);
+    end;
+    procedure get_config(
+        pi_config_id        VARCHAR2 default null,
+        pi_config_code      VARCHAR2 default null,
+        pi_config_name      VARCHAR2 default null,
+        pi_status           VARCHAR2 default 'ACTIVE',
+        po_app_config       out APP_CONFIG
+    )
+    is
+    begin
+        get_config(
+            pi_config_id        => pi_config_id,
+            pi_config_code      => pi_config_code,
+            pi_config_name      => pi_config_name,
+            pi_status           => pi_status
+        );
+        po_app_config   := g_app_config;
     end;
 end APP_CONFIG_UTIL;
 /

@@ -9,7 +9,8 @@ create or replace type APP_EXTEND force
 under APP_BASE_OBJECT(
     "__code__"          VARCHAR2(64),
     "__mode__"          VARCHAR2(64),
-    "__config_value__"  VARCHAR2(4000),
+    "__config__"        VARCHAR2(4000),
+    "__app_config__"    APP_CONFIG,
     created_ts          TIMESTAMP,
     created_dnum        NUMBER,
     created_tnum        NUMBER,
@@ -29,6 +30,7 @@ under APP_BASE_OBJECT(
         pi_code             VARCHAR2    default null,
         pi_mode             VARCHAR2    default null),
 
+    member procedure get_config,
     member procedure get_datetime_dim(
         pio_ts              in out TIMESTAMP,
         pio_dnum            in out NUMBER,
@@ -69,11 +71,23 @@ as
         (self as APP_BASE_OBJECT).initialize(
             pi_name => pi_name, 
             pi_description => pi_description);
-        "__code__"          := pi_code;
-        "__mode__"          := pi_mode;
+        -- get config by default
+        get_config();
+        "__config__"        := "__app_config__".config_value.to_string;
+        -- apply custom config
+        "__code__"          := nvl(pi_code, "__app_config__".config_code);
+        "__mode__"          := nvl(pi_mode, "__app_config__".config_value.get_string('__mode__'));
         get_created_datetime_dim();
         get_updated_datetime_dim();
         get_duration();
+    end;
+    member procedure get_config
+    is
+    begin
+        app_config_util.get_config(
+            pi_config_code  => 'LOGGER_CONFIG_CODE', 
+            pi_config_name  => 'APP_LOGGER',
+            po_app_config   => "__app_config__");
     end;
 
     member procedure get_datetime_dim(
@@ -99,7 +113,7 @@ as
         (self as APP_BASE_OBJECT).get_attributes_info();
         "__attributes__".put('__code__'         ,"__code__");
         "__attributes__".put('__mode__'         ,"__mode__");
-        "__attributes__".put('__config_value__' ,"__config_value__");
+        "__attributes__".put('__config__'       ,"__config__");
         "__attributes__".put('created_ts'       ,created_ts);
         "__attributes__".put('created_dnum'     ,created_dnum);
         "__attributes__".put('created_tnum'     ,created_tnum);
