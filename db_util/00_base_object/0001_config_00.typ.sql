@@ -1,3 +1,10 @@
+/* **********************************************************************************
+** APP_CONFIG
+** **********************************************************************************
+**  Description: 
+**  Template:
+** **********************************************************************************/
+
 create or replace type APP_CONFIG force
 under APP_BASE_OBJECT(
     config_id       NUMBER,
@@ -46,9 +53,7 @@ as
     constructor function APP_CONFIG return self as result
     is
     begin
-        self.initialize(
-            pi_name         => 'APP_CONFIG',
-            pi_status       => 'ACTIVE');
+        self.initialize();
         return;
     end;
 
@@ -86,7 +91,8 @@ as
     is
     begin
         (self as APP_BASE_OBJECT).initialize(
-            pi_name         => nvl(pi_name, "__name__"), 
+            pi_name         => nvl(pi_name, 'APP_CONFIG'),
+            pi_config_code  => 'APP_CONFIG', 
             pi_description  => pi_description
         );
         self.set_config(
@@ -96,7 +102,7 @@ as
             pi_config_name      => pi_config_name,
             pi_config_value     => pi_config_value,
             pi_config_type      => pi_config_type,
-            pi_status           => nvl(pi_status, status)
+            pi_status           => nvl(pi_status, 'ACTIVE')
         );
     end;
 
@@ -112,7 +118,7 @@ as
         (self as APP_BASE_OBJECT).get_attributes_info();
         "__attributes__".put('config_id'    ,config_id);
         "__attributes__".put('config_code'  ,config_code);
-        "__attributes__".put('config_user'  ,config_code);
+        "__attributes__".put('config_user'  ,config_user);
         "__attributes__".put('config_name'  ,config_name);
         "__attributes__".put('config_value' ,config_value.to_string);
         "__attributes__".put('status'       ,status);

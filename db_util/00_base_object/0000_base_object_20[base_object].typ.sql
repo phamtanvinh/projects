@@ -7,8 +7,9 @@
 create or replace type APP_BASE_OBJECT force
 as object(
     "__name__"          VARCHAR2(64),
-    "__ts__"            TIMESTAMP,
+    "__config_code__"   VARCHAR2(64),
     "__attributes__"    JSON_OBJECT_T,
+    "__ts__"            TIMESTAMP,
     description         VARCHAR2(1024),
     created_date        DATE,
     updated_date        DATE,
@@ -18,6 +19,7 @@ as object(
 -- initialize
     member procedure initialize(        
         pi_name             VARCHAR2 default null,
+        pi_config_code      VARCHAR2 default null,
         pi_description      VARCHAR2 default null
     ),
     member procedure get_attributes_info,
@@ -35,7 +37,7 @@ as
     constructor function APP_BASE_OBJECT return self as result
     is
     begin
-        self.initialize(pi_name => 'APP_BASE_OBJECT');
+        self.initialize();
         update_all();
         return;
     end;
@@ -43,21 +45,24 @@ as
     member procedure get_attributes_info
     is
     begin
-        "__attributes__"    := new JSON_OBJECT_T();
-        "__attributes__".put('__name__'     ,"__name__");
-        "__attributes__".put('__ts__'       ,"__ts__");
-        "__attributes__".put('description'  ,description);
-        "__attributes__".put('created_date' ,created_date);
-        "__attributes__".put('updated_date' ,updated_date);
+        "__attributes__" := new JSON_OBJECT_T();
+        "__attributes__".put('__name__'         ,"__name__");
+        "__attributes__".put('__config_code__'  ,"__config_code__");
+        "__attributes__".put('__ts__'           ,"__ts__");
+        "__attributes__".put('description'      ,description);
+        "__attributes__".put('created_date'     ,created_date);
+        "__attributes__".put('updated_date'     ,updated_date);
     end;
 
     member procedure initialize(
         pi_name             VARCHAR2 default null,
+        pi_config_code      VARCHAR2 default null,
         pi_description      VARCHAR2 default null
     )
     is
     begin
-        "__name__"          := pi_name;
+        "__name__"          := nvl(pi_name          ,'APP_BASE_OBJECT');
+        "__config_code__"   := nvl(pi_config_code   ,'APP_BASE_OBJECT');
         "__ts__"            := current_timestamp;
         description         := pi_description;
         created_date        := sysdate;

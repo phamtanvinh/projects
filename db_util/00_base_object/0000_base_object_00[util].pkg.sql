@@ -38,7 +38,8 @@ as
     function get_unix_ts(pi_ts TIMESTAMP default current_timestamp) return NUMBER;
 -- feature: manipulate dictionary
     function get_dictionary(pi_json    JSON_OBJECT_T) return DICTIONARY;
-
+-- feature: manipulate transaction
+    function get_transaction_id return VARCHAR2;
 end APP_UTIL;
 /
 
@@ -177,6 +178,12 @@ as
         end loop;
 
         return l_dictionary;
+    end;
+-- feature: manipulate transaction
+    function get_transaction_id return VARCHAR2
+    is
+    begin
+        return dbms_transaction.local_transaction_id(true);
     end;
 end APP_UTIL;
 /

@@ -7,8 +7,11 @@
 ** **********************************************************************************/
 create or replace type APP_EXTEND force
 under APP_BASE_OBJECT(
-    "__code__"          VARCHAR2(64),
+-- private attributes
+    "__app_config__"    APP_CONFIG,
+    "__config__"        JSON_OBJECT_T,
     "__mode__"          VARCHAR2(64),
+-- globall attributes
     created_ts          TIMESTAMP,
     created_dnum        NUMBER,
     created_tnum        NUMBER,
@@ -24,17 +27,26 @@ under APP_BASE_OBJECT(
 -- initialize
     member procedure initialize(
         pi_name             VARCHAR2    default null,
+        pi_config_code      VARCHAR2    default null,
         pi_description      VARCHAR2    default null,
-        pi_code             VARCHAR2    default null,
-        pi_mode             VARCHAR2    default null),
-
+        pi_config           VARCHAR2    default null,
+        pi_mode             VARCHAR2    default null
+    ),
+    member procedure get_config(
+        pi_config_code      VARCHAR2 default null,
+        pi_config_name      VARCHAR2 default null
+    ),
+    member procedure set_private_attributes(
+        pi_config           VARCHAR2    default null,
+        pi_mode             VARCHAR2    default null
+    ),
     member procedure get_datetime_dim(
-        pio_ts          in out TIMESTAMP,
-        pio_dnum        in out NUMBER,
-        pio_tnum        in out NUMBER,
-        pio_unix_ts     in out NUMBER,
-        pio_date        in out DATE),
-
+        pio_ts              in out TIMESTAMP,
+        pio_dnum            in out NUMBER,
+        pio_tnum            in out NUMBER,
+        pio_unix_ts         in out NUMBER,
+        pio_date            in out DATE
+    ),
     overriding member procedure get_attributes_info,
 -- manipulate
     member procedure get_created_datetime_dim,
@@ -51,36 +63,67 @@ as
     constructor function APP_EXTEND return self as result
     is
     begin
-        initialize(
-            pi_name         => 'APP_EXTEND'
-        );
+        initialize();
         return;
     end;
 -- initialize
     member procedure initialize(
         pi_name             VARCHAR2    default null,
+        pi_config_code      VARCHAR2    default null,
         pi_description      VARCHAR2    default null,
-        pi_code             VARCHAR2    default null,
+        pi_config           VARCHAR2    default null,
         pi_mode             VARCHAR2    default null
     )
     is
     begin
         (self as APP_BASE_OBJECT).initialize(
-            pi_name => pi_name, 
-            pi_description => pi_description);
-        "__code__"          := pi_code;
-        "__mode__"          := pi_mode;
+            pi_name         => nvl(pi_name          ,'APP_EXTEND'),
+            pi_config_code  => nvl(pi_config_code   ,'APP_EXTEND'),
+            pi_description  => pi_description);
+        -- get config by default
+        get_config();
+        -- apply custom config
+        set_private_attributes(
+            pi_mode         => pi_mode,
+            pi_config       => pi_config
+        );
         get_created_datetime_dim();
         get_updated_datetime_dim();
         get_duration();
     end;
+    member procedure get_config(
+        pi_config_code      VARCHAR2 default null,
+        pi_config_name      VARCHAR2 default null
+    )
+    is
+    begin
+        app_config_util.get_config(
+            pi_config_code  => nvl(pi_config_code   ,"__config_code__"), 
+            pi_config_name  => nvl(pi_config_name   ,"__name__"),
+            po_app_config   => "__app_config__");
+    end;
+
+    member procedure set_private_attributes(
+        pi_config           VARCHAR2    default null,
+        pi_mode             VARCHAR2    default null
+    )
+    is
+    begin
+        if pi_config is not null
+        then
+            "__config__"    := new JSON_OBJECT_T(pi_config);     
+        else
+            "__config__"    := "__app_config__".config_value;
+        end if;
+        "__mode__" := nvl(pi_mode, "__app_config__".config_value.get_string('__mode__'));
+    end;
 
     member procedure get_datetime_dim(
-        pio_ts          in out TIMESTAMP,
-        pio_dnum        in out NUMBER,
-        pio_tnum        in out NUMBER,
-        pio_unix_ts     in out NUMBER,
-        pio_date        in out DATE
+        pio_ts              in out TIMESTAMP,
+        pio_dnum            in out NUMBER,
+        pio_tnum            in out NUMBER,
+        pio_unix_ts         in out NUMBER,
+        pio_date            in out DATE
     )
     is
     begin
@@ -96,8 +139,8 @@ as
     is
     begin
         (self as APP_BASE_OBJECT).get_attributes_info();
-        "__attributes__".put('__code__'         ,"__code__");
         "__attributes__".put('__mode__'         ,"__mode__");
+        "__attributes__".put('__config__'       ,"__config__".to_string);
         "__attributes__".put('created_ts'       ,created_ts);
         "__attributes__".put('created_dnum'     ,created_dnum);
         "__attributes__".put('created_tnum'     ,created_tnum);
