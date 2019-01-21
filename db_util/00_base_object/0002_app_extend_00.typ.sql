@@ -7,9 +7,9 @@
 ** **********************************************************************************/
 create or replace type APP_EXTEND force
 under APP_BASE_OBJECT(
-    "__app_config__"    APP_CONFIG,
 -- private attributes
-    "__config_value__"  VARCHAR2(4000),
+    "__app_config__"    APP_CONFIG,
+    "__config__"        JSON_OBJECT_T,
     "__mode__"          VARCHAR2(64),
 -- globall attributes
     created_ts          TIMESTAMP,
@@ -29,7 +29,7 @@ under APP_BASE_OBJECT(
         pi_name             VARCHAR2    default null,
         pi_config_code      VARCHAR2    default null,
         pi_description      VARCHAR2    default null,
-        pi_config_value     VARCHAR2    default null,
+        pi_config           VARCHAR2    default null,
         pi_mode             VARCHAR2    default null
     ),
     member procedure get_config(
@@ -37,7 +37,7 @@ under APP_BASE_OBJECT(
         pi_config_name      VARCHAR2 default null
     ),
     member procedure set_private_attributes(
-        pi_config_value     VARCHAR2    default null,
+        pi_config           VARCHAR2    default null,
         pi_mode             VARCHAR2    default null
     ),
     member procedure get_datetime_dim(
@@ -71,7 +71,7 @@ as
         pi_name             VARCHAR2    default null,
         pi_config_code      VARCHAR2    default null,
         pi_description      VARCHAR2    default null,
-        pi_config_value     VARCHAR2    default null,
+        pi_config           VARCHAR2    default null,
         pi_mode             VARCHAR2    default null
     )
     is
@@ -85,7 +85,7 @@ as
         -- apply custom config
         set_private_attributes(
             pi_mode         => pi_mode,
-            pi_config_value => pi_config_value
+            pi_config       => pi_config
         );
         get_created_datetime_dim();
         get_updated_datetime_dim();
@@ -98,19 +98,24 @@ as
     is
     begin
         app_config_util.get_config(
-            pi_config_code  => nvl(pi_config_code, "__config_code__"), 
-            pi_config_name  => nvl(pi_config_name, "__name__"),
+            pi_config_code  => nvl(pi_config_code   ,"__config_code__"), 
+            pi_config_name  => nvl(pi_config_name   ,"__name__"),
             po_app_config   => "__app_config__");
     end;
 
     member procedure set_private_attributes(
-        pi_config_value     VARCHAR2    default null,
+        pi_config           VARCHAR2    default null,
         pi_mode             VARCHAR2    default null
     )
     is
     begin
-        "__config_value__"  := nvl(pi_mode, "__app_config__".config_value.to_string);
-        "__mode__"          := nvl(pi_mode, "__app_config__".config_value.get_string('__mode__'));
+        if pi_config is not null
+        then
+            "__config__"    := new JSON_OBJECT_T(pi_config);     
+        else
+            "__config__"    := "__app_config__".config_value;
+        end if;
+        "__mode__" := nvl(pi_mode, "__app_config__".config_value.get_string('__mode__'));
     end;
 
     member procedure get_datetime_dim(
@@ -135,7 +140,7 @@ as
     begin
         (self as APP_BASE_OBJECT).get_attributes_info();
         "__attributes__".put('__mode__'         ,"__mode__");
-        "__attributes__".put('__config_value__' ,"__config_value__");
+        "__attributes__".put('__config__'       ,"__config__".to_string);
         "__attributes__".put('created_ts'       ,created_ts);
         "__attributes__".put('created_dnum'     ,created_dnum);
         "__attributes__".put('created_tnum'     ,created_tnum);

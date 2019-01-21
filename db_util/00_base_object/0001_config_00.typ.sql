@@ -53,10 +53,7 @@ as
     constructor function APP_CONFIG return self as result
     is
     begin
-        self.initialize(
-            pi_name         => 'APP_CONFIG',
-            pi_config_code  => 'APP_CONFIG',
-            pi_status       => 'ACTIVE');
+        self.initialize();
         return;
     end;
 
@@ -94,7 +91,7 @@ as
     is
     begin
         (self as APP_BASE_OBJECT).initialize(
-            pi_name         => nvl(pi_name, "__name__"),
+            pi_name         => nvl(pi_name, 'APP_CONFIG'),
             pi_config_code  => 'APP_CONFIG', 
             pi_description  => pi_description
         );
@@ -105,7 +102,7 @@ as
             pi_config_name      => pi_config_name,
             pi_config_value     => pi_config_value,
             pi_config_type      => pi_config_type,
-            pi_status           => nvl(pi_status, status)
+            pi_status           => nvl(pi_status, 'ACTIVE')
         );
     end;
 

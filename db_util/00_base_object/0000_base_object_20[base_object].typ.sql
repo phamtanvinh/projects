@@ -8,8 +8,8 @@ create or replace type APP_BASE_OBJECT force
 as object(
     "__name__"          VARCHAR2(64),
     "__config_code__"   VARCHAR2(64),
-    "__ts__"            TIMESTAMP,
     "__attributes__"    JSON_OBJECT_T,
+    "__ts__"            TIMESTAMP,
     description         VARCHAR2(1024),
     created_date        DATE,
     updated_date        DATE,

@@ -3,6 +3,8 @@ as
 -- GLOBAL CONFIG
     g_config                JSON_OBJECT_T;
     g_table_name            VARCHAR2(64);
+-- PRIVATE CONFIG
+    "__config__"            JSON_OBJECT_T;
 -- GLOBAL ATTRIBUTES
 -- UPDATE CONFIG
     procedure update_config;
