@@ -48,14 +48,16 @@ as
         l_table_name    := get_object_name(
                 pi_object_name  => pi_table_name,
                 pi_prefix       => nvl(pi_prefix, g_prefix.get_string('prefix')),
-                pi_suffix       => nvl(pi_suffix, g_suffix.get_string('suffix_table'))
+                pi_suffix       => nvl(pi_suffix, g_suffix.get_string('table'))
             );
 
         return l_table_name; 
     end;
 begin
-    g_prefix.put('prefix'           ,'app');
-    g_suffix.put('suffix_table'     ,'tab');
+    g_prefix.put('prefix'       ,'app');
+    g_suffix.put('table'        ,'tab');
+    g_suffix.put('type'         ,'typ');
+    g_suffix.put('package'      ,'pkg');
     g_config_default.put('table_name'       , get_table_name(pi_table_name => 'config'));
 end APP_META_DATA_UTIL;
 /

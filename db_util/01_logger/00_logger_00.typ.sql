@@ -30,8 +30,8 @@ under APP_EXTEND(
 -- initialize
     member procedure initialize(
         pi_name                 VARCHAR2    default null,
+        pi_config_code          VARCHAR2    default null,
         pi_description          VARCHAR2    default null,
-        pi_code                 VARCHAR2    default null,
         pi_mode                 VARCHAR2    default null,
         pi_transaction_code     VARCHAR2    default null,
         pi_app_user             VARCHAR2    default null,
@@ -67,9 +67,7 @@ as
     constructor function APP_LOGGER return self as result
     is
     begin
-        initialize(
-            pi_name             => 'APP_LOGGER'
-        );
+        initialize();
         return;
     end;
     constructor function APP_LOGGER(
@@ -81,7 +79,6 @@ as
     is
     begin
         initialize(
-            pi_name                 => 'APP_LOGGER',
             pi_transaction_code     => pi_transaction_code,
             pi_app_user             => pi_app_user,
             pi_unit_name            => pi_unit_name,
@@ -94,8 +91,8 @@ as
 -- initialize
     member procedure initialize(
         pi_name                 VARCHAR2    default null,
+        pi_config_code          VARCHAR2    default null,
         pi_description          VARCHAR2    default null,
-        pi_code                 VARCHAR2    default null,
         pi_mode                 VARCHAR2    default null,
         pi_transaction_code     VARCHAR2    default null,
         pi_app_user             VARCHAR2    default null,
@@ -107,9 +104,9 @@ as
     is
     begin
         (self as APP_EXTEND).initialize(
-            pi_name             => pi_name,
+            pi_name             => nvl(pi_name          ,'APP_LOGGER'),
+            pi_config_code      => nvl(pi_config_code   ,'APP_LOGGER'),
             pi_description      => pi_description,
-            pi_code             => pi_code,
             pi_mode             => pi_mode);
         app_user        := pi_app_user;
         set_transaction(pi_transaction_code     => pi_transaction_code);
