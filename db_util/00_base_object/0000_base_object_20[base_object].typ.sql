@@ -2,7 +2,6 @@
 ** APP_BASE_OBJECT
 ** **********************************************************************************
 **  Description: this is abstractive object for custom type to inheriate
-**  Template:
 ** **********************************************************************************/
 create or replace type APP_BASE_OBJECT force
 as object(

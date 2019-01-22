@@ -3,7 +3,6 @@
 ** **********************************************************************************
 **  Description: this is extend object of base object for some config and auto update
 **      date time methods
-**  Template:
 ** **********************************************************************************/
 create or replace type APP_EXTEND force
 under APP_BASE_OBJECT(
