@@ -1,3 +1,9 @@
+/* **********************************************************************************
+** APP_CONFIG_UTIL
+** **********************************************************************************
+**  Description: 
+** **********************************************************************************/
+
 create or replace package APP_CONFIG_UTIL
 authid current_user
 as
@@ -21,7 +27,7 @@ as
 -- MANIPULATE ATTRIBUTES
     procedure set_config(pi_app_config  APP_CONFIG default null);
     procedure update_app_config;
--- MANIPULATE TABLE
+-- MANIPULATE TABLES
     procedure initialize;
     procedure insert_config;
     procedure get_config(
@@ -81,7 +87,7 @@ as
         g_app_config.updated_date           := g_updated_date;
     end;
 
--- MANIPULATE TABLE
+-- MANIPULATE TABLES
     procedure initialize
     is
         l_sql               VARCHAR2(4000);

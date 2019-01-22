@@ -1,3 +1,9 @@
+/* **********************************************************************************
+** APP_CONFIG_SQL
+** **********************************************************************************
+**  Description: 
+** **********************************************************************************/
+
 create or replace package APP_CONFIG_SQL
 as
 -- GLOBAL CONFIG
@@ -74,8 +80,7 @@ as
                 :DESCRIPTION,
                 :STATUS,
                 :CREATED_DATE,
-                :UPDATED_DATE
-            );
+                :UPDATED_DATE);
             COMMIT;
         END;';
         return l_sql;

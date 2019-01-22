@@ -1,9 +1,16 @@
+/* **********************************************************************************
+** APP_META_DATA_UTIL
+** **********************************************************************************
+**  Description: 
+** **********************************************************************************/
+
 create or replace package APP_META_DATA_UTIL
 as
 -- global
     g_prefix                JSON_OBJECT_T := NEW JSON_OBJECT_T();
     g_suffix                JSON_OBJECT_T := NEW JSON_OBJECT_T();
     g_config_default        JSON_OBJECT_T := NEW JSON_OBJECT_T();
+    g_logger_default        JSON_OBJECT_T := NEW JSON_OBJECT_T();            
     function get_object_name(
         pi_object_name      VARCHAR2,
         pi_prefix           VARCHAR2 default null,
@@ -58,6 +65,8 @@ begin
     g_suffix.put('table'        ,'tab');
     g_suffix.put('type'         ,'typ');
     g_suffix.put('package'      ,'pkg');
-    g_config_default.put('table_name'       , get_table_name(pi_table_name => 'config'));
+    g_config_default.put('table_name'       ,get_table_name(pi_table_name => 'config'));
+    g_logger_default.put('running_table'    ,get_table_name(pi_table_name => 'logger_running'));
+    g_logger_default.put('exception_table'  ,get_table_name(pi_table_name => 'logger_exception'));
 end APP_META_DATA_UTIL;
 /
