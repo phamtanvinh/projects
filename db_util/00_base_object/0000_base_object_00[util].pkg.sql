@@ -45,6 +45,11 @@ as
     function get_dictionary(pi_json    JSON_OBJECT_T) return DICTIONARY;
 -- feature: manipulate transaction
     function get_transaction_id return VARCHAR2;
+-- feature: manipulate json
+    procedure update_json(
+        pio_json in out JSON_OBJECT_T,
+        pi_json         JSON_OBJECT_T
+    );
 end APP_UTIL;
 /
 
@@ -189,6 +194,24 @@ as
     is
     begin
         return dbms_transaction.local_transaction_id(true);
+    end;
+-- feature: manipulate json
+    procedure update_json(
+        pio_json in out JSON_OBJECT_T,
+        pi_json         JSON_OBJECT_T
+    )
+    is
+        l_keys      JSON_KEY_LIST := pi_json.get_keys();
+        l_key       VARCHAR2(64);
+    begin
+        for i in 1..l_keys.count
+        loop
+            l_key   := l_keys(i);
+            if pio_json.has(l_key)
+            then
+                pio_json.put(l_key, pi_json.get_string(l_key));
+            end if;
+        end loop;
     end;
 end APP_UTIL;
 /

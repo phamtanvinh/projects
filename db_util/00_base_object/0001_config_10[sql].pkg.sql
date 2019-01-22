@@ -113,5 +113,6 @@ as
     end;
 begin
 -- SETUP BY DEFAULT
-    g_config                := app_meta_data_util.g_config_default;
+    g_config    := new JSON_OBJECT_T();
+    g_config.put('table_name', app_meta_data_util.get_table_name(pi_table_name => 'config'));
 end APP_CONFIG_SQL;

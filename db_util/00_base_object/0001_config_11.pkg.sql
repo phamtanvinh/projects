@@ -10,7 +10,6 @@ as
 -- GLOBAL CONFIG
     g_app_config            APP_CONFIG;
     g_config                JSON_OBJECT_T;
-    g_table_name            VARCHAR2(64);
 -- GLOBAL ATTRIBUTES
     g_config_id             NUMBER;
     g_config_code           VARCHAR2(64);
@@ -94,9 +93,9 @@ as
     begin
         refresh_config();
         dbms_output.put_line('Initialize ...');
-        dbms_output.put_line('Drop table '||g_table_name ||' ...');
-        app_util.drop_table(g_table_name, true);
-        dbms_output.put_line('Create table '||g_table_name ||' ...');
+        dbms_output.put_line('Drop table '||g_config.get_string('table_name') ||' ...');
+        app_util.drop_table(g_config.get_string('table_name'), true);
+        dbms_output.put_line('Create table '||g_config.get_string('table_name') ||' ...');
         l_sql   := app_config_sql.get_config_table_sql();
         --dbms_output.put_line(l_sql);
         execute immediate l_sql;
@@ -174,8 +173,9 @@ as
         po_app_config   := g_app_config;
     end;
 begin
+-- SETUP BY DEFAULT
     g_app_config        := new APP_CONFIG();
-    g_config            := app_meta_data_util.g_config_default ;
-    g_table_name        := g_config.get_string('table_name');
+    g_config            := new JSON_OBJECT_T() ;
+    g_config.put('table_name', app_meta_data_util.get_table_name(pi_table_name => 'config'));
 end APP_CONFIG_UTIL;
 /

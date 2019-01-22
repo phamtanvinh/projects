@@ -13,6 +13,7 @@ as
 -- PRIVATE CONFIG
     "__config__"            JSON_OBJECT_T;
 -- MANIPULATE CONFIG
+    procedure set_global_config;
     procedure refresh_config;
 -- MANIPULATE TABLES
     procedure initialize;
@@ -32,13 +33,23 @@ end APP_LOGGER_UTIL;
 create or replace package body APP_LOGGER_UTIL
 as
 -- MANIPULATE CONFIG
+    procedure set_global_config
+    is
+    begin
+        g_config.put('running_table'    ,'ODS_LOGGER_RUNNING');
+        g_config.put('exception_table'  ,'ODS_LOGGER_EXCEPTION');
+    end;
+
     procedure refresh_config
     is
     begin
-        -- custom
-        g_config.put('running_table'    ,'ODS_LOGGER_RUNNING');
-        g_config.put('exception_table'  ,'ODS_LOGGER_EXCEPTION');
-        app_logger_sql.g_config         := g_config;
+        if g_config.get_boolean('is_overrided_config')
+        then
+            set_global_config();
+            app_util.update_json(
+                pio_json    => app_logger_sql.g_config, 
+                pi_json     => g_config);
+        end if;
     end;
 -- MANIPULATE TABLES
     procedure initialize
@@ -147,6 +158,9 @@ as
     end;
 
 begin
+-- SETUP BY DEFAULT
     g_app_config        := new APP_CONFIG();
-    g_config            := app_meta_data_util.g_logger_default;
+    g_config            := new JSON_OBJECT_T();
+    g_config.put('is_overrided_config', true);
 end;
+/

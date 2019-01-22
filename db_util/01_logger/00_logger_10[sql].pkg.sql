@@ -152,6 +152,9 @@ as
     end;
 begin
 -- SETUP BY DEFAULT
-    g_config                := app_meta_data_util.g_logger_default;
+    g_config        := new JSON_OBJECT_T();
+    g_app_logger    := new APP_LOGGER;
+    g_config.put('running_table'    ,app_meta_data_util.get_table_name(pi_table_name => 'logger_running'));
+    g_config.put('exception_table'  ,app_meta_data_util.get_table_name(pi_table_name => 'logger_exception'));
 end APP_LOGGER_SQL;
 /
