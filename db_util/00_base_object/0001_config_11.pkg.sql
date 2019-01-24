@@ -17,7 +17,7 @@ as
 -- MANIPULATE ATTRIBUTES
     procedure set_config(pi_app_config  APP_CONFIG default null);
 -- MANIPULATE TABLES
-    procedure initialize;
+    procedure initialize(pi_is_forced BOOLEAN default false);
     procedure insert_config;
     procedure get_config(
         pi_config_id        VARCHAR2 default null,
@@ -51,18 +51,27 @@ as
     end;
 
 -- MANIPULATE TABLES
-    procedure initialize
+    procedure initialize(pi_is_forced BOOLEAN default false)
     is
         l_sql               VARCHAR2(4000);
     begin
         refresh_config();
         dbms_output.put_line('Initialize ...');
-        dbms_output.put_line('Drop table '||g_config.get_string('table_name') ||' ...');
-        app_util.drop_table(g_config.get_string('table_name'), true);
-        dbms_output.put_line('Create table '||g_config.get_string('table_name') ||' ...');
-        l_sql   := app_config_sql.get_config_table_sql();
-        --dbms_output.put_line(l_sql);
-        execute immediate l_sql;
+        if pi_is_forced
+        then
+            dbms_output.put_line('Drop table '||g_config.get_string('table_name') ||' ...');
+            app_util.drop_table(g_config.get_string('table_name'), true);
+        else
+            dbms_output.put_line('Warning: all config data will be clear if you pass "true", please follow code below');
+        end if;
+        l_sql   := app_config_sql.get_config_sql();
+        if pi_is_forced
+        then
+            dbms_output.put_line('Create table '||g_config.get_string('table_name') ||' ...');
+            execute immediate l_sql;
+        else
+            dbms_output.put_line(l_sql);
+        end if;
         dbms_output.put_line('Done.');
     end;
 
@@ -71,7 +80,7 @@ as
         l_sql               VARCHAR2(4000);
     begin
         refresh_config();
-        l_sql   := app_config_sql.get_config_insert_sql();
+        l_sql   := app_config_sql.get_insert_sql();
         --dbms_output.put_line(l_sql);
         execute immediate l_sql
             using

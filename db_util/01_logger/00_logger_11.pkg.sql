@@ -15,6 +15,7 @@ as
 -- MANIPULATE CONFIG
     -- default config
     procedure reset_config;
+    procedure get_private_config;
     procedure set_global_config(
         pi_package_name     VARCHAR2 default null,
         pi_config_name      VARCHAR2 default null
@@ -44,11 +45,29 @@ as
     begin
         g_app_config        := new APP_CONFIG();
         g_config            := new JSON_OBJECT_T();
+        "__config__"        := new JSON_OBJECT_T();
         g_config.put('running_table'    ,app_meta_data_util.get_table_name(pi_table_name => 'logger_running'));
         g_config.put('exception_table'  ,app_meta_data_util.get_table_name(pi_table_name => 'logger_exception'));     
         -- mode control by default
         g_config.put('is_overrided_config', true);
         g_config.put('is_loaded_custom_config', true);
+        g_config.put('config_id',       '');
+        g_config.put('config_code',     'APP_LOGGER');
+        g_config.put('config_name',     'APP_LOGGER');
+        g_config.put('config_status',   'ACTIVE');
+    end;
+
+    procedure get_private_config
+    is
+    begin
+        app_config_util.get_config(        
+            pi_config_id        => g_config.get_string('config_id'),
+            pi_config_code      => g_config.get_string('config_code'),
+            pi_config_name      => g_config.get_string('config_name'),
+            pi_status           => g_config.get_string('config_status'),
+            po_app_config       => g_app_config
+        );
+        "__config__"    := g_app_config.config_value;
     end;
 
     procedure set_global_config(

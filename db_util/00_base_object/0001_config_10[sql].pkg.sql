@@ -15,8 +15,8 @@ as
 -- UPDATE CONFIG
     procedure update_config;
 -- GET SQL
-    function get_config_table_sql return VARCHAR2;
-    function get_config_insert_sql return VARCHAR2;
+    function get_create_table_sql return VARCHAR2;
+    function get_insert_sql return VARCHAR2;
     function get_config_sql return VARCHAR2;
 end APP_CONFIG_SQL;
 /
@@ -30,7 +30,7 @@ as
         g_table_name            := g_config.get_string('table_name');
     end;
 -- GET SQL
-    function get_config_table_sql return VARCHAR2
+    function get_create_table_sql return VARCHAR2
     is
         l_sql           VARCHAR2(4000);
     begin
@@ -52,7 +52,7 @@ as
         return l_sql;
     end;
 
-    function get_config_insert_sql return VARCHAR2
+    function get_insert_sql return VARCHAR2
     is
         l_sql           VARCHAR2(4000);
     begin
@@ -104,9 +104,12 @@ as
                 UPDATED_DATE
             FROM '||g_table_name||'
             WHERE 1 = 1
-                AND (CONFIG_ID  = :pi_config_id OR CONFIG_CODE = :pi_config_code)
-                AND CONFIG_NAME = :pi_config_name
-                AND STATUS      = :pi_status
+                AND (CONFIG_ID  = :pi_config_id 
+                    OR (
+                        CONFIG_CODE = :pi_config_code
+                        AND CONFIG_NAME = :pi_config_name
+                        AND STATUS      = :pi_status
+                    ))
                 AND ROWNUM      = 1
             ';
         return l_sql;
