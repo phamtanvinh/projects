@@ -3,6 +3,7 @@
 ** **********************************************************************************
 **  Description: this is abstractive object for custom type to inheriate
 ** **********************************************************************************/
+
 create or replace type APP_BASE_OBJECT force
 as object(
     "__name__"          VARCHAR2(64),

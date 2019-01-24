@@ -13,9 +13,17 @@ as
 -- PRIVATE CONFIG
     "__config__"            JSON_OBJECT_T;
 -- MANIPULATE CONFIG
+    -- default config
+    procedure reset_config;
+    procedure get_private_config;
+    procedure set_global_config(
+        pi_package_name     VARCHAR2 default null,
+        pi_config_name      VARCHAR2 default null
+    );
+    -- [__config__] < [private] < [custom]
     procedure refresh_config;
 -- MANIPULATE TABLES
-    procedure initialize;
+    procedure initialize(pi_is_forced BOOLEAN default false);
     procedure set_logger(pi_app_logger APP_LOGGER);
     procedure insert_logger_running(pi_app_logger APP_LOGGER);
     procedure insert_logger_running(
@@ -32,31 +40,104 @@ end APP_LOGGER_UTIL;
 create or replace package body APP_LOGGER_UTIL
 as
 -- MANIPULATE CONFIG
+    procedure reset_config
+    is
+    begin
+        g_app_config        := new APP_CONFIG();
+        g_config            := new JSON_OBJECT_T();
+        "__config__"        := new JSON_OBJECT_T();
+        g_config.put('running_table'    ,app_meta_data_util.get_table_name(pi_table_name => 'logger_running'));
+        g_config.put('exception_table'  ,app_meta_data_util.get_table_name(pi_table_name => 'logger_exception'));     
+        -- mode control by default
+        g_config.put('is_overrided_config', true);
+        g_config.put('is_loaded_custom_config', true);
+        g_config.put('config_id',       '');
+        g_config.put('config_code',     'APP_LOGGER');
+        g_config.put('config_name',     'APP_LOGGER');
+        g_config.put('config_status',   'ACTIVE');
+    end;
+
+    procedure get_private_config
+    is
+    begin
+        app_config_util.get_config(        
+            pi_config_id        => g_config.get_string('config_id'),
+            pi_config_code      => g_config.get_string('config_code'),
+            pi_config_name      => g_config.get_string('config_name'),
+            pi_status           => g_config.get_string('config_status'),
+            po_app_config       => g_app_config
+        );
+        "__config__"    := g_app_config.config_value;
+    end;
+
+    procedure set_global_config(
+        pi_package_name     VARCHAR2    default null,
+        pi_config_name      VARCHAR2    default null
+    )
+    is
+        l_package_name      VARCHAR2(64)    := nvl(pi_package_name, 'APP_LOGGER_CUSTOM');
+        l_config_name       VARCHAR2(64)    := nvl(pi_config_name,  'g_config');
+        l_config            VARCHAR2(128)   := l_package_name || '.' || l_config_name;
+        l_sql               VARCHAR2(4000);
+    begin
+        if g_config.get_boolean('is_loaded_custom_config')
+        then
+            l_sql := '
+                begin
+                    app_util.update_json(APP_LOGGER_UTIL.g_config, '|| l_config ||');
+                end;';
+            --dbms_output.put_line(l_config);
+            --dbms_output.put_line(l_sql);
+            execute immediate l_sql;
+        end if;
+    end;
+
     procedure refresh_config
     is
     begin
-        -- custom
-        g_config.put('running_table'    ,'ODS_LOGGER_RUNNING');
-        g_config.put('exception_table'  ,'ODS_LOGGER_EXCEPTION');
-        app_logger_sql.g_config         := g_config;
+        -- load [custom]
+        if g_config.get_boolean('is_overrided_config')
+        then
+            set_global_config();
+        end if;
+        -- load [private]
+        -- load [__config__]
+        -- setup config
+        app_util.update_json(
+            pio_json    => app_logger_sql.g_config, 
+            pi_json     => g_config);
     end;
 -- MANIPULATE TABLES
-    procedure initialize
+    procedure initialize(pi_is_forced BOOLEAN default false)
     is
         l_sql       VARCHAR2(4000);
     begin
         refresh_config();
         dbms_output.put_line('Initialize ...');
-        app_util.drop_table(g_config.get_string('running_table'), true);
-        app_util.drop_table(g_config.get_string('exception_table'), true);
+        if pi_is_forced
+        then 
+            app_util.drop_table(g_config.get_string('running_table'), true);
+            app_util.drop_table(g_config.get_string('exception_table'), true);
+        end if;
+
         l_sql       := app_logger_sql.get_create_logger_running_sql();
-        --dbms_output.put_line(l_sql);
-        execute immediate l_sql;
+        if pi_is_forced
+        then 
+            execute immediate l_sql;
+        else
+            dbms_output.put_line(l_sql);
+        end if;
+
         l_sql       := app_logger_sql.get_create_logger_exception_sql();
-        --dbms_output.put_line(l_sql);
-        execute immediate l_sql;
+        if pi_is_forced
+        then 
+            execute immediate l_sql;
+        else
+            dbms_output.put_line(l_sql);
+        end if;
         dbms_output.put_line('Done');
     end;
+    
     procedure set_logger(pi_app_logger APP_LOGGER)
     is
     begin
@@ -147,6 +228,7 @@ as
     end;
 
 begin
-    g_app_config        := new APP_CONFIG();
-    g_config            := app_meta_data_util.g_logger_default;
+-- SETUP BY DEFAULT
+    reset_config();
 end;
+/

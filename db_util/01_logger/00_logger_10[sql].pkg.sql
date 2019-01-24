@@ -11,7 +11,8 @@ as
     g_config                JSON_OBJECT_T;
 -- PRIVATE CONFIG
     "__config__"            JSON_OBJECT_T;
--- UPDATE CONFIG
+-- MANIPULATE CONFIG
+    procedure reset_config;
 -- GET SQL
     function get_create_logger_running_sql return VARCHAR2;
     function get_create_logger_exception_sql return VARCHAR2;
@@ -22,7 +23,16 @@ end APP_LOGGER_SQL;
 
 create or replace package body APP_LOGGER_SQL
 as
--- UPDATE CONFIG
+-- MANIPULATE CONFIG
+    procedure reset_config
+    is
+    begin
+        g_config        := new JSON_OBJECT_T();
+        g_app_logger    := new APP_LOGGER;
+        g_config.put('running_table'    ,app_meta_data_util.get_table_name(pi_table_name => 'logger_running'));
+        g_config.put('exception_table'  ,app_meta_data_util.get_table_name(pi_table_name => 'logger_exception'));     
+    end;
+
 -- GET SQL
     function get_create_logger_running_sql return VARCHAR2
     is
@@ -152,6 +162,6 @@ as
     end;
 begin
 -- SETUP BY DEFAULT
-    g_config                := app_meta_data_util.g_logger_default;
+    reset_config();
 end APP_LOGGER_SQL;
 /
