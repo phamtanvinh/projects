@@ -50,6 +50,10 @@ as
     procedure update_json(
         pio_json in out JSON_OBJECT_T,
         pi_json         JSON_OBJECT_T
+    );    
+    procedure update_json(
+        pio_json in out JSON_OBJECT_T,
+        pi_json         VARCHAR2
     );
 end APP_UTIL;
 /
@@ -213,6 +217,19 @@ as
                 pio_json.put(l_key, pi_json.get_string(l_key));
             end if;
         end loop;
+    end;
+
+    procedure update_json(
+        pio_json in out JSON_OBJECT_T,
+        pi_json         VARCHAR2
+    )
+    is
+        l_json  JSON_OBJECT_T := JSON_OBJECT_T(pi_json);
+    begin
+        update_json(
+            pio_json    => pio_json,
+            pi_json     => l_json
+        );
     end;
 end APP_UTIL;
 /

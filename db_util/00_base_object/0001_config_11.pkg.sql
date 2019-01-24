@@ -10,22 +10,12 @@ as
 -- GLOBAL CONFIG
     g_app_config            APP_CONFIG;
     g_config                JSON_OBJECT_T;
--- GLOBAL ATTRIBUTES
-    g_config_id             NUMBER;
-    g_config_code           VARCHAR2(64);
-    g_config_name           VARCHAR2(64);
-    g_config_user           VARCHAR2(64);
-    g_config_value          VARCHAR2(4000);
-    g_config_type           VARCHAR2(64);
-    g_description           VARCHAR2(1024);
-    g_status                VARCHAR2(16);
-    g_created_date          DATE;
-    g_updated_date          DATE;
+-- PRIVATE CONFIG
+    "__config__"            VARCHAR2(4000);
 -- MANIPULATE CONFIG
     procedure refresh_config;
 -- MANIPULATE ATTRIBUTES
     procedure set_config(pi_app_config  APP_CONFIG default null);
-    procedure update_app_config;
 -- MANIPULATE TABLES
     procedure initialize;
     procedure insert_config;
@@ -57,33 +47,7 @@ as
     procedure set_config(pi_app_config  APP_CONFIG default null)
     is
     begin
-        g_app_config            := nvl(pi_app_config, g_app_config);
-        g_config_id			    := g_app_config.config_id;
-        g_config_code		 	:= g_app_config.config_code;
-        g_config_name			:= g_app_config.config_name;
-        g_config_user			:= g_app_config.config_user;
-        g_config_value			:= g_app_config.config_value.to_string;
-        g_config_type			:= g_app_config.config_type;
-        g_description			:= g_app_config.description;
-        g_status			    := g_app_config.status;
-        g_created_date			:= g_app_config.created_date;
-        g_updated_date			:= g_app_config.updated_date;
-    end;
-
-    procedure update_app_config
-    is
-    begin
-        g_app_config                        := new APP_CONFIG();
-        g_app_config.config_id              := g_config_id;
-        g_app_config.config_code			:= g_config_code;
-        g_app_config.config_user			:= g_config_user;
-        g_app_config.config_name			:= g_config_name;
-        g_app_config.config_value           := JSON_OBJECT_T(g_config_value);
-        g_app_config.config_type			:= g_config_type;
-        g_app_config.description			:= g_description;
-        g_app_config.status			        := g_status;
-        g_app_config.created_date			:= g_created_date;
-        g_app_config.updated_date           := g_updated_date;
+        g_app_config    := nvl(pi_app_config, g_app_config);
     end;
 
 -- MANIPULATE TABLES
@@ -111,16 +75,16 @@ as
         --dbms_output.put_line(l_sql);
         execute immediate l_sql
             using
-                g_config_id,
-                g_config_code,
-                g_config_user,
-                g_config_name,
-                g_config_value,
-                g_config_type,
-                g_description,
-                g_status,
-                g_created_date,
-                g_updated_date;
+                g_app_config.config_id,
+                g_app_config.config_code,
+                g_app_config.config_user,
+                g_app_config.config_name,
+                g_app_config.config_value.to_string,
+                g_app_config.config_type,
+                g_app_config.description,
+                g_app_config.status,
+                g_app_config.created_date,
+                g_app_config.updated_date;
     end;
 
     procedure get_config(
@@ -131,28 +95,32 @@ as
     )
     is
         l_sql               VARCHAR2(4000);
+        l_config_value      VARCHAR2(4000);
     begin
         refresh_config();
         l_sql   := app_config_sql.get_config_sql();
         --dbms_output.put_line(l_sql);
         execute immediate l_sql 
             into 
-                g_config_id,
-                g_config_code,
-                g_config_user,
-                g_config_name,
-                g_config_value,
-                g_config_type,
-                g_description,
-                g_status,
-                g_created_date,
-                g_updated_date 
+                g_app_config.config_id,
+                g_app_config.config_code,
+                g_app_config.config_user,
+                g_app_config.config_name,
+                l_config_value,
+                g_app_config.config_type,
+                g_app_config.description,
+                g_app_config.status,
+                g_app_config.created_date,
+                g_app_config.updated_date 
             using 
                 pi_config_id, 
                 pi_config_code, 
                 pi_config_name, 
                 pi_status;
-        update_app_config();
+        g_app_config.config_value := JSON_OBJECT_T(l_config_value);
+    exception
+        when no_data_found then
+            dbms_output.put_line('You have not set up config in the table');
     end;
 
     procedure get_config(
