@@ -1,0 +1,11 @@
+*.orig
+_tmp*
+source/packages/logger_no_op.pkb
+videos
+#Only accept the zip files in the release directory
+releases/*
+!releases/*.zip
+#For developers
+temp/*
+#For IMDone Atom.io plugin
+.imdone/*
