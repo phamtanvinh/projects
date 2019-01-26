@@ -7,11 +7,11 @@
 create or replace package APP_LOGGER_UTIL
 as
 -- GLOBAL CONFIG
-    g_config                JSON_OBJECT_T;
+    g_config                PLJSON;
     g_app_config            APP_CONFIG;
     g_app_logger            APP_LOGGER;
 -- PRIVATE CONFIG
-    "__config__"            JSON_OBJECT_T;
+    "__config__"            PLJSON;
 -- MANIPULATE CONFIG
     -- default config
     procedure reset_config;
@@ -44,8 +44,8 @@ as
     is
     begin
         g_app_config        := new APP_CONFIG();
-        g_config            := new JSON_OBJECT_T();
-        "__config__"        := new JSON_OBJECT_T();
+        g_config            := new PLJSON();
+        "__config__"        := new PLJSON();
         g_config.put('running_table'    ,app_meta_data_util.get_table_name(pi_table_name => 'logger_running'));
         g_config.put('exception_table'  ,app_meta_data_util.get_table_name(pi_table_name => 'logger_exception'));     
         -- mode control by default
@@ -61,10 +61,10 @@ as
     is
     begin
         app_config_util.get_config(        
-            pi_config_id        => g_config.get_string('config_id'),
-            pi_config_code      => g_config.get_string('config_code'),
-            pi_config_name      => g_config.get_string('config_name'),
-            pi_status           => g_config.get_string('config_status'),
+            pi_config_id        => g_config.get('config_id').get_string,
+            pi_config_code      => g_config.get('config_code').get_string,
+            pi_config_name      => g_config.get('config_name').get_string,
+            pi_status           => g_config.get('config_status').get_string,
             po_app_config       => g_app_config
         );
         "__config__"    := g_app_config.config_value;
@@ -80,7 +80,7 @@ as
         l_config            VARCHAR2(128)   := l_package_name || '.' || l_config_name;
         l_sql               VARCHAR2(4000);
     begin
-        if g_config.get_boolean('is_loaded_custom_config')
+        if g_config.get('is_loaded_custom_config').get_bool
         then
             l_sql := '
                 begin
@@ -96,7 +96,7 @@ as
     is
     begin
         -- load [custom]
-        if g_config.get_boolean('is_overrided_config')
+        if g_config.get('is_overrided_config').get_bool
         then
             set_global_config();
         end if;
@@ -116,8 +116,8 @@ as
         dbms_output.put_line('Initialize ...');
         if pi_is_forced
         then 
-            app_util.drop_table(g_config.get_string('running_table'), true);
-            app_util.drop_table(g_config.get_string('exception_table'), true);
+            app_util.drop_table(g_config.get('running_table').get_string, true);
+            app_util.drop_table(g_config.get('exception_table').get_string, true);
         end if;
 
         l_sql       := app_logger_sql.get_create_logger_running_sql();

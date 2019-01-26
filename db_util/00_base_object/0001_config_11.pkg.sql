@@ -9,7 +9,7 @@ authid current_user
 as
 -- GLOBAL CONFIG
     g_app_config            APP_CONFIG;
-    g_config                JSON_OBJECT_T;
+    g_config                PLJSON;
 -- PRIVATE CONFIG
     "__config__"            VARCHAR2(4000);
 -- MANIPULATE CONFIG
@@ -57,16 +57,14 @@ as
     begin
         refresh_config();
         dbms_output.put_line('Initialize ...');
-        if pi_is_forced
-        then
+        if pi_is_forced then
             dbms_output.put_line('Drop table '||g_config.get_string('table_name') ||' ...');
             app_util.drop_table(g_config.get_string('table_name'), true);
         else
             dbms_output.put_line('Warning: all config data will be clear if you pass "true", please follow code below');
         end if;
         l_sql   := app_config_sql.get_config_sql();
-        if pi_is_forced
-        then
+        if pi_is_forced then
             dbms_output.put_line('Create table '||g_config.get_string('table_name') ||' ...');
             execute immediate l_sql;
         else
@@ -88,7 +86,7 @@ as
                 g_app_config.config_code,
                 g_app_config.config_user,
                 g_app_config.config_name,
-                g_app_config.config_value.to_string,
+                g_app_config.config_value.to_char(false),
                 g_app_config.config_type,
                 g_app_config.description,
                 g_app_config.status,
@@ -126,7 +124,7 @@ as
                 pi_config_code, 
                 pi_config_name, 
                 pi_status;
-        g_app_config.config_value := JSON_OBJECT_T(l_config_value);
+        g_app_config.config_value := PLJSON(l_config_value);
     exception
         when no_data_found then
             dbms_output.put_line('You have not set up config in the table');
@@ -152,7 +150,7 @@ as
 begin
 -- SETUP BY DEFAULT
     g_app_config        := new APP_CONFIG();
-    g_config            := new JSON_OBJECT_T() ;
+    g_config            := new PLJSON() ;
     g_config.put('table_name', app_meta_data_util.get_table_name(pi_table_name => 'config'));
 end APP_CONFIG_UTIL;
 /

@@ -21,7 +21,7 @@ as
         pi_dictionary   DICTIONARY,
         pi_rpad_size    NUMBER default g_rpad_size) return VARCHAR2;
     function get_string_format(
-        pi_jo           JSON_OBJECT_T,
+        pi_jo           PLJSON,
         pi_rpad_size    NUMBER default g_rpad_size) return VARCHAR2;
     procedure print_string_format(
         pi_key          VARCHAR2, 
@@ -33,7 +33,7 @@ as
         pi_rpad_size    NUMBER default g_rpad_size);
     
     procedure print_string_format(
-        pi_jo           JSON_OBJECT_T,
+        pi_jo           PLJSON,
         pi_rpad_size    NUMBER default g_rpad_size );
 -- feature: manipulate table
     function exist_table(pi_table_name VARCHAR2) return BOOLEAN;
@@ -43,16 +43,16 @@ as
     function get_tnum(pi_ts TIMESTAMP default current_timestamp) return NUMBER;
     function get_unix_ts(pi_ts TIMESTAMP default current_timestamp) return NUMBER;
 -- feature: manipulate dictionary
-    function get_dictionary(pi_json    JSON_OBJECT_T) return DICTIONARY;
+    function get_dictionary(pi_json    PLJSON) return DICTIONARY;
 -- feature: manipulate transaction
     function get_transaction_id return VARCHAR2;
 -- feature: manipulate json
     procedure update_json(
-        pio_json in out JSON_OBJECT_T,
-        pi_json         JSON_OBJECT_T
+        pio_json in out PLJSON,
+        pi_json         PLJSON
     );    
     procedure update_json(
-        pio_json in out JSON_OBJECT_T,
+        pio_json in out PLJSON,
         pi_json         VARCHAR2
     );
 end APP_UTIL;
@@ -79,8 +79,7 @@ as
         l_value         VARCHAR2(4000);
         l_string        VARCHAR2(4000);
     begin
-        while l_key is not null
-        loop
+        while l_key is not null loop
             l_value     := pi_dictionary(l_key);
             l_string    := l_string || get_string_format(l_key, l_value, pi_rpad_size);
             l_key       := pi_dictionary.next(l_key);
@@ -89,18 +88,17 @@ as
     end;
 
     function get_string_format(
-        pi_jo           JSON_OBJECT_T,
+        pi_jo           PLJSON,
         pi_rpad_size    NUMBER default g_rpad_size) return VARCHAR2
     is
-        l_keys          JSON_KEY_LIST := pi_jo.get_keys;
+        l_keys          PLJSON_LIST := pi_jo.get_keys();
         l_key           VARCHAR2(64);
         l_value         VARCHAR2(4000);
         l_string        VARCHAR2(4000);
     begin
-        for i in 1..l_keys.count
-        loop
-            l_key       := l_keys(i);
-            l_value     := pi_jo.get_string(l_key);
+        for i in 1..l_keys.count loop
+            l_key       := l_keys.get(i).get_string();
+            l_value     := pi_jo.get(l_key).get_string();
             l_string    := l_string || get_string_format(pi_key => l_key, pi_value => l_value, pi_rpad_size => pi_rpad_size);
         end loop;
         return l_string;
@@ -128,7 +126,7 @@ as
     end;
 
     procedure print_string_format(
-        pi_jo           JSON_OBJECT_T,
+        pi_jo           PLJSON,
         pi_rpad_size    NUMBER default g_rpad_size )
     is
         l_string        VARCHAR2(4000);
@@ -147,8 +145,7 @@ as
         from tab 
         where tname = upper(pi_table_name);
 
-        if l_counter > 0
-        then
+        if l_counter > 0 then
             l_is_true := true;
         end if;
 
@@ -157,8 +154,7 @@ as
     procedure drop_table(pi_table_name VARCHAR2, pi_is_forced BOOLEAN default false)
     is
     begin
-        if exist_table(pi_table_name) and pi_is_forced
-        then
+        if exist_table(pi_table_name) and pi_is_forced then
             execute immediate 'DROP TABLE ' || pi_table_name || ' CASCADE CONSTRAINTS PURGE';
         end if;
           
@@ -182,14 +178,13 @@ as
         return round((cast(pi_ts AS DATE) - DATE '1970-01-01')*24*60*60);
     end;
 -- feature: manipulate dictionary
-    function get_dictionary(pi_json    JSON_OBJECT_T) return DICTIONARY
+    function get_dictionary(pi_json    PLJSON) return DICTIONARY
     is
-        l_keys          JSON_KEY_LIST := pi_json.get_keys();
+        l_keys          PLJSON_LIST := pi_json.get_keys();
         l_dictionary    DICTIONARY;
     begin
-        for i in 1..l_keys.count
-        loop
-            l_dictionary(l_keys(i)) := pi_json.get_string(l_keys(i));
+        for i in 1..l_keys.count loop
+            l_dictionary(l_keys.get(i).get_string()) := pi_json.get(l_keys.get(i).get_string()).get_string();
         end loop;
 
         return l_dictionary;
@@ -202,29 +197,27 @@ as
     end;
 -- feature: manipulate json
     procedure update_json(
-        pio_json in out JSON_OBJECT_T,
-        pi_json         JSON_OBJECT_T
+        pio_json in out PLJSON,
+        pi_json         PLJSON
     )
     is
-        l_keys      JSON_KEY_LIST := pi_json.get_keys();
+        l_keys      PLJSON_LIST := pi_json.get_keys();
         l_key       VARCHAR2(64);
     begin
-        for i in 1..l_keys.count
-        loop
-            l_key   := l_keys(i);
-            if pio_json.has(l_key)
-            then
-                pio_json.put(l_key, pi_json.get_string(l_key));
+        for i in 1..l_keys.count loop
+            l_key   := l_keys.get(i).get_string();
+            if pio_json.exist(l_key) then
+                pio_json.put(l_key, pi_json.get(l_key));
             end if;
         end loop;
     end;
 
     procedure update_json(
-        pio_json in out JSON_OBJECT_T,
+        pio_json in out PLJSON,
         pi_json         VARCHAR2
     )
     is
-        l_json  JSON_OBJECT_T := JSON_OBJECT_T(pi_json);
+        l_json  PLJSON := PLJSON(pi_json);
     begin
         update_json(
             pio_json    => pio_json,

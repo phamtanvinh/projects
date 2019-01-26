@@ -10,7 +10,7 @@ under APP_BASE_OBJECT(
     config_code     VARCHAR2(64),
     config_user     VARCHAR2(64),
     config_name     VARCHAR2(64),
-    config_value    JSON_OBJECT_T,
+    config_value    PLJSON       ,
     config_type     VARCHAR2(64),
     status          VARCHAR2(16),
 -- static
@@ -22,7 +22,7 @@ under APP_BASE_OBJECT(
         pi_config_code      VARCHAR2        default null,
         pi_config_user      VARCHAR2        default null,
         pi_config_name      VARCHAR2        default null,
-        pi_config_value     JSON_OBJECT_T   default new JSON_OBJECT_T(),
+        pi_config_value     PLJSON          default PLJSON(),
         pi_config_type      VARCHAR2        default null,
         pi_status           VARCHAR2        default null
 
@@ -37,7 +37,7 @@ under APP_BASE_OBJECT(
         pi_config_code      VARCHAR2        default null,
         pi_config_user      VARCHAR2        default null,
         pi_config_name      VARCHAR2        default null,
-        pi_config_value     JSON_OBJECT_T   default new JSON_OBJECT_T(),
+        pi_config_value     PLJSON          default PLJSON(),
         pi_config_type      VARCHAR2        default null,
         pi_status           VARCHAR2        default null
     )
@@ -62,7 +62,7 @@ as
         pi_config_code      VARCHAR2        default null,
         pi_config_user      VARCHAR2        default null,
         pi_config_name      VARCHAR2        default null,
-        pi_config_value     JSON_OBJECT_T   default new JSON_OBJECT_T(),
+        pi_config_value     PLJSON          default PLJSON(),
         pi_config_type      VARCHAR2        default null,
         pi_status           VARCHAR2        default null
     )
@@ -83,7 +83,7 @@ as
         pi_config_code      VARCHAR2        default null,
         pi_config_user      VARCHAR2        default null,
         pi_config_name      VARCHAR2        default null,
-        pi_config_value     JSON_OBJECT_T   default new JSON_OBJECT_T(),
+        pi_config_value     PLJSON          default PLJSON(),
         pi_config_type      VARCHAR2        default null,
         pi_status           VARCHAR2        default null
     )
@@ -119,7 +119,7 @@ as
         "__attributes__".put('config_code'  ,config_code);
         "__attributes__".put('config_user'  ,config_user);
         "__attributes__".put('config_name'  ,config_name);
-        "__attributes__".put('config_value' ,config_value.to_string);
+        "__attributes__".put('config_value' ,config_value.to_char);
         "__attributes__".put('status'       ,status);
     end;
 -- manipulate

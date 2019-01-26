@@ -7,8 +7,8 @@
 create or replace package APP_META_DATA_UTIL
 as
 -- global
-    g_prefix                JSON_OBJECT_T := NEW JSON_OBJECT_T();
-    g_suffix                JSON_OBJECT_T := NEW JSON_OBJECT_T();
+    g_prefix                PLJSON := NEW PLJSON();
+    g_suffix                PLJSON := NEW PLJSON();
     function get_object_name(
         pi_object_name      VARCHAR2,
         pi_prefix           VARCHAR2 default null,
@@ -33,9 +33,8 @@ as
     is
         l_object_name   VARCHAR2(64);
     begin
-        l_object_name   := nvl(pi_prefix, g_prefix.get_string('prefix')) || '_' || pi_object_name;
-        if pi_suffix is not null
-        then
+        l_object_name   := nvl(pi_prefix, g_prefix.get('prefix').get_string()) || '_' || pi_object_name;
+        if pi_suffix is not null then
             l_object_name := l_object_name || '_' || pi_suffix; 
         end if;
 
@@ -52,8 +51,8 @@ as
     begin
         l_table_name    := get_object_name(
                 pi_object_name  => pi_table_name,
-                pi_prefix       => nvl(pi_prefix, g_prefix.get_string('prefix')),
-                pi_suffix       => nvl(pi_suffix, g_suffix.get_string('table'))
+                pi_prefix       => nvl(pi_prefix, g_prefix.get('prefix').get_string()),
+                pi_suffix       => nvl(pi_suffix, g_suffix.get('table').get_string())
             );
 
         return l_table_name; 

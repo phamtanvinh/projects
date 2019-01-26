@@ -8,7 +8,7 @@ create or replace type APP_EXTEND force
 under APP_BASE_OBJECT(
 -- private attributes
     "__app_config__"    APP_CONFIG,
-    "__config__"        JSON_OBJECT_T,
+    "__config__"        PLJSON,
     "__mode__"          VARCHAR2(64),
 -- globall attributes
     created_ts          TIMESTAMP,
@@ -30,10 +30,6 @@ under APP_BASE_OBJECT(
         pi_description      VARCHAR2    default null,
         pi_config           VARCHAR2    default null,
         pi_mode             VARCHAR2    default null
-    ),
-    member procedure get_config(
-        pi_config_code      VARCHAR2 default null,
-        pi_config_name      VARCHAR2 default null
     ),
     member procedure set_private_attributes(
         pi_config           VARCHAR2    default null,
@@ -79,8 +75,6 @@ as
             pi_name         => nvl(pi_name          ,'APP_EXTEND'),
             pi_config_code  => nvl(pi_config_code   ,'APP_EXTEND'),
             pi_description  => pi_description);
-        -- get config by default
-        get_config();
         -- apply custom config
         set_private_attributes(
             pi_mode         => pi_mode,
@@ -90,17 +84,6 @@ as
         get_updated_datetime_dim();
         get_duration();
     end;
-    member procedure get_config(
-        pi_config_code      VARCHAR2 default null,
-        pi_config_name      VARCHAR2 default null
-    )
-    is
-    begin
-        app_config_util.get_config(
-            pi_config_code  => nvl(pi_config_code   ,"__config_code__"), 
-            pi_config_name  => nvl(pi_config_name   ,"__name__"),
-            po_app_config   => "__app_config__");
-    end;
 
     member procedure set_private_attributes(
         pi_config           VARCHAR2    default null,
@@ -108,13 +91,17 @@ as
     )
     is
     begin
-        if pi_config is not null
-        then
-            "__config__"    := new JSON_OBJECT_T(pi_config);     
+        if pi_config is not null then
+            "__config__"    := new PLJSON(pi_config);     
         else
-            "__config__"    := "__app_config__".config_value;
+            "__config__"    := nvl("__app_config__".config_value, new PLJSON());
         end if;
-        "__mode__" := nvl(pi_mode, "__app_config__".config_value.get_string('__mode__'));
+        
+        if pi_mode is not null then
+            "__mode__"      := pi_mode;
+        elsif "__config__".get('__mode__') is not null then
+            "__mode__"      := "__config__".get('__mode__').get_string();
+        end if;
     end;
 
     member procedure get_datetime_dim(
@@ -139,7 +126,7 @@ as
     begin
         (self as APP_BASE_OBJECT).get_attributes_info();
         "__attributes__".put('__mode__'         ,"__mode__");
-        "__attributes__".put('__config__'       ,"__config__".to_string);
+        "__attributes__".put('__config__'       ,"__config__".to_char(false));
         "__attributes__".put('created_ts'       ,created_ts);
         "__attributes__".put('created_dnum'     ,created_dnum);
         "__attributes__".put('created_tnum'     ,created_tnum);

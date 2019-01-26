@@ -8,7 +8,7 @@ create or replace type APP_BASE_OBJECT force
 as object(
     "__name__"          VARCHAR2(64),
     "__config_code__"   VARCHAR2(64),
-    "__attributes__"    JSON_OBJECT_T,
+    "__attributes__"    PLJSON,
     "__ts__"            TIMESTAMP,
     description         VARCHAR2(1024),
     created_date        DATE,
@@ -45,7 +45,7 @@ as
     member procedure get_attributes_info
     is
     begin
-        "__attributes__" := new JSON_OBJECT_T();
+        "__attributes__" := new PLJSON();
         "__attributes__".put('__name__'         ,"__name__");
         "__attributes__".put('__config_code__'  ,"__config_code__");
         "__attributes__".put('__ts__'           ,"__ts__");

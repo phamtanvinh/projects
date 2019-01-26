@@ -7,10 +7,10 @@
 create or replace package APP_CONFIG_SQL
 as
 -- GLOBAL CONFIG
-    g_config                JSON_OBJECT_T;
+    g_config                PLJSON;
     g_table_name            VARCHAR2(64);
 -- PRIVATE CONFIG
-    "__config__"            JSON_OBJECT_T;
+    "__config__"            PLJSON;
 -- GLOBAL ATTRIBUTES
 -- UPDATE CONFIG
     procedure update_config;
@@ -27,7 +27,7 @@ as
     procedure update_config
     is
     begin
-        g_table_name            := g_config.get_string('table_name');
+        g_table_name            := g_config.get('table_name').get_string;
     end;
 -- GET SQL
     function get_create_table_sql return VARCHAR2
@@ -116,6 +116,6 @@ as
     end;
 begin
 -- SETUP BY DEFAULT
-    g_config    := new JSON_OBJECT_T();
+    g_config    := new PLJSON();
     g_config.put('table_name', app_meta_data_util.get_table_name(pi_table_name => 'config'));
 end APP_CONFIG_SQL;

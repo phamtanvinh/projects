@@ -8,9 +8,9 @@ create or replace package APP_LOGGER_SQL
 as
 -- GLOBAL CONFIG
     g_app_logger            APP_LOGGER;
-    g_config                JSON_OBJECT_T;
+    g_config                PLJSON;
 -- PRIVATE CONFIG
-    "__config__"            JSON_OBJECT_T;
+    "__config__"            PLJSON;
 -- MANIPULATE CONFIG
     procedure reset_config;
 -- GET SQL
@@ -27,7 +27,7 @@ as
     procedure reset_config
     is
     begin
-        g_config        := new JSON_OBJECT_T();
+        g_config        := new PLJSON();
         g_app_logger    := new APP_LOGGER;
         g_config.put('running_table'    ,app_meta_data_util.get_table_name(pi_table_name => 'logger_running'));
         g_config.put('exception_table'  ,app_meta_data_util.get_table_name(pi_table_name => 'logger_exception'));     
@@ -39,7 +39,7 @@ as
         l_sql   VARCHAR2(4000);
     begin
         l_sql := '
-            CREATE TABLE '|| g_config.get_string('running_table') ||'(
+            CREATE TABLE '|| g_config.get('running_table').get_string ||'(
                 TRANSACTION_ID        VARCHAR2(64),
                 TRANSACTION_CODE      VARCHAR2(64),
                 APP_USER              VARCHAR2(64),
@@ -62,7 +62,7 @@ as
         l_sql   VARCHAR2(4000);
     begin
         l_sql := '
-            CREATE TABLE '|| g_config.get_string('exception_table') ||'(
+            CREATE TABLE '|| g_config.get('exception_table').get_string ||'(
                 TRANSACTION_ID        VARCHAR2(64),
                 TRANSACTION_CODE      VARCHAR2(64),
                 APP_USER              VARCHAR2(64),
@@ -87,7 +87,7 @@ as
         l_sql   VARCHAR2(4000);
     begin
         l_sql :='
-            INSERT INTO '|| g_config.get_string('running_table') ||'(
+            INSERT INTO '|| g_config.get('running_table').get_string ||'(
                     TRANSACTION_ID,
                     TRANSACTION_CODE,
                     APP_USER,
@@ -123,7 +123,7 @@ as
         l_sql   VARCHAR2(4000);
     begin
         l_sql := '
-            INSERT INTO '|| g_config.get_string('exception_table') ||'(
+            INSERT INTO '|| g_config.get('exception_table').get_string ||'(
                     TRANSACTION_ID,
                     TRANSACTION_CODE,
                     APP_USER,
