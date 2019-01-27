@@ -1,60 +1,60 @@
 /* **********************************************************************************
-** APP_LOGGER_UTIL
+** app_logger_util
 ** **********************************************************************************
-**  Description: 
+**  description: 
 ** **********************************************************************************/
 
-create or replace package APP_LOGGER_UTIL
+create or replace package app_logger_util
 as
--- GLOBAL CONFIG
-    g_config                PLJSON;
-    g_app_config            APP_CONFIG;
-    g_app_logger            APP_LOGGER;
--- PRIVATE CONFIG
-    "__config__"            PLJSON;
--- MANIPULATE CONFIG
+-- global config
+    g_config                pljson;
+    g_app_config            app_config;
+    g_app_logger            app_logger;
+-- private config
+    "__config__"            pljson;
+-- manipulate config
     -- default config
     procedure reset_config;
     procedure get_private_config;
     procedure set_global_config(
-        pi_package_name     VARCHAR2 default null,
-        pi_config_name      VARCHAR2 default null
+        pi_package_name     varchar2 default null,
+        pi_config_name      varchar2 default null
     );
     -- [__config__] < [private] < [custom]
     procedure refresh_config;
--- MANIPULATE TABLES
-    procedure initialize(pi_is_forced BOOLEAN default false);
-    procedure set_logger(pi_app_logger APP_LOGGER);
-    procedure insert_logger_running(pi_app_logger APP_LOGGER);
+-- manipulate tables
+    procedure initialize(pi_is_forced boolean default false);
+    procedure set_logger(pi_app_logger app_logger);
+    procedure insert_logger_running(pi_app_logger app_logger);
     procedure insert_logger_running(
-        pi_log_step_name        VARCHAR2,
-        pi_log_step_description VARCHAR2
+        pi_log_step_name        varchar2,
+        pi_log_step_description varchar2
     );
     procedure insert_logger_running(
-        pi_is_repeated      BOOLEAN default false
+        pi_is_repeated      boolean default false
     );
     procedure insert_logger_exception;
-end APP_LOGGER_UTIL;
+end app_logger_util;
 /
 
-create or replace package body APP_LOGGER_UTIL
+create or replace package body app_logger_util
 as
--- MANIPULATE CONFIG
+-- manipulate config
     procedure reset_config
     is
     begin
-        g_app_config        := new APP_CONFIG();
-        g_config            := new PLJSON();
-        "__config__"        := new PLJSON();
+        g_app_config        := new app_config();
+        g_config            := new pljson();
+        "__config__"        := new pljson();
         g_config.put('running_table'    ,app_meta_data_util.get_table_name(pi_table_name => 'logger_running'));
         g_config.put('exception_table'  ,app_meta_data_util.get_table_name(pi_table_name => 'logger_exception'));     
         -- mode control by default
         g_config.put('is_overrided_config', true);
         g_config.put('is_loaded_custom_config', true);
         g_config.put('config_id',       '');
-        g_config.put('config_code',     'APP_LOGGER');
-        g_config.put('config_name',     'APP_LOGGER');
-        g_config.put('config_status',   'ACTIVE');
+        g_config.put('config_code',     'app_logger');
+        g_config.put('config_name',     'app_logger');
+        g_config.put('config_status',   'active');
     end;
 
     procedure get_private_config
@@ -71,20 +71,20 @@ as
     end;
 
     procedure set_global_config(
-        pi_package_name     VARCHAR2    default null,
-        pi_config_name      VARCHAR2    default null
+        pi_package_name     varchar2    default null,
+        pi_config_name      varchar2    default null
     )
     is
-        l_package_name      VARCHAR2(64)    := nvl(pi_package_name, 'APP_LOGGER_CUSTOM');
-        l_config_name       VARCHAR2(64)    := nvl(pi_config_name,  'g_config');
-        l_config            VARCHAR2(128)   := l_package_name || '.' || l_config_name;
-        l_sql               VARCHAR2(4000);
+        l_package_name      varchar2(64)    := nvl(pi_package_name, 'app_logger_custom');
+        l_config_name       varchar2(64)    := nvl(pi_config_name,  'g_config');
+        l_config            varchar2(128)   := l_package_name || '.' || l_config_name;
+        l_sql               varchar2(4000);
     begin
         if g_config.get('is_loaded_custom_config').get_bool
         then
             l_sql := '
                 begin
-                    app_util.update_json(APP_LOGGER_UTIL.g_config, '|| l_config ||');
+                    app_util.update_json(app_logger_util.g_config, '|| l_config ||');
                 end;';
             --dbms_output.put_line(l_config);
             --dbms_output.put_line(l_sql);
@@ -107,13 +107,13 @@ as
             pio_json    => app_logger_sql.g_config, 
             pi_json     => g_config);
     end;
--- MANIPULATE TABLES
-    procedure initialize(pi_is_forced BOOLEAN default false)
+-- manipulate tables
+    procedure initialize(pi_is_forced boolean default false)
     is
-        l_sql       VARCHAR2(4000);
+        l_sql       varchar2(4000);
     begin
         refresh_config();
-        dbms_output.put_line('Initialize ...');
+        dbms_output.put_line('initialize ...');
         if pi_is_forced
         then 
             app_util.drop_table(g_config.get('running_table').get_string, true);
@@ -135,18 +135,18 @@ as
         else
             dbms_output.put_line(l_sql);
         end if;
-        dbms_output.put_line('Done');
+        dbms_output.put_line('done');
     end;
     
-    procedure set_logger(pi_app_logger APP_LOGGER)
+    procedure set_logger(pi_app_logger app_logger)
     is
     begin
         g_app_logger    := pi_app_logger;
     end;
     -- this is anchor for updating logger (last call)
-    procedure insert_logger_running(pi_app_logger APP_LOGGER)
+    procedure insert_logger_running(pi_app_logger app_logger)
     is
-        l_sql   VARCHAR2(4000);
+        l_sql   varchar2(4000);
     begin
         refresh_config();
         g_app_logger := nvl(pi_app_logger, g_app_logger);
@@ -171,8 +171,8 @@ as
 
     -- this will be update step and datetime and duration
     procedure insert_logger_running(
-        pi_log_step_name        VARCHAR2,
-        pi_log_step_description VARCHAR2)
+        pi_log_step_name        varchar2,
+        pi_log_step_description varchar2)
     is
     begin
         g_app_logger.update_step(
@@ -184,7 +184,7 @@ as
 
     -- repeat step
     procedure insert_logger_running(
-        pi_is_repeated      BOOLEAN default false
+        pi_is_repeated      boolean default false
     )
     is
     begin
@@ -201,7 +201,7 @@ as
 
     procedure insert_logger_exception
     is
-        l_sql   VARCHAR2(4000);
+        l_sql   varchar2(4000);
     begin
         refresh_config();
         g_app_logger.initialize_exception();
@@ -228,7 +228,7 @@ as
     end;
 
 begin
--- SETUP BY DEFAULT
+-- setup by default
     reset_config();
 end;
 /

@@ -1,46 +1,46 @@
 /* **********************************************************************************
-** APP_EXTEND
+** app_extend
 ** **********************************************************************************
-**  Description: this is extend object of base object for some config and auto update
+**  description: this is extend object of base object for some config and auto update
 **      date time methods
 ** **********************************************************************************/
-create or replace type APP_EXTEND force
-under APP_BASE_OBJECT(
+create or replace type app_extend force
+under app_base_object(
 -- private attributes
-    "__app_config__"    APP_CONFIG,
-    "__config__"        PLJSON,
-    "__mode__"          VARCHAR2(64),
+    "__app_config__"    app_config,
+    "__config__"        pljson,
+    "__mode__"          varchar2(64),
 -- globall attributes
-    created_ts          TIMESTAMP,
-    created_dnum        NUMBER,
-    created_tnum        NUMBER,
-    created_unix_ts     NUMBER,
-    updated_ts          TIMESTAMP,
-    updated_dnum        NUMBER,
-    updated_tnum        NUMBER,
-    updated_unix_ts     NUMBER,
-    duration            NUMBER,
+    created_ts          timestamp,
+    created_dnum        number,
+    created_tnum        number,
+    created_unix_ts     number,
+    updated_ts          timestamp,
+    updated_dnum        number,
+    updated_tnum        number,
+    updated_unix_ts     number,
+    duration            number,
 -- static
 -- constructor
-    constructor function APP_EXTEND return self as result,
+    constructor function app_extend return self as result,
 -- initialize
     member procedure initialize(
-        pi_name             VARCHAR2    default null,
-        pi_config_code      VARCHAR2    default null,
-        pi_description      VARCHAR2    default null,
-        pi_config           VARCHAR2    default null,
-        pi_mode             VARCHAR2    default null
+        pi_name             varchar2    default null,
+        pi_config_code      varchar2    default null,
+        pi_description      varchar2    default null,
+        pi_config           varchar2    default null,
+        pi_mode             varchar2    default null
     ),
     member procedure set_private_attributes(
-        pi_config           VARCHAR2    default null,
-        pi_mode             VARCHAR2    default null
+        pi_config           varchar2    default null,
+        pi_mode             varchar2    default null
     ),
     member procedure get_datetime_dim(
-        pio_ts              in out TIMESTAMP,
-        pio_dnum            in out NUMBER,
-        pio_tnum            in out NUMBER,
-        pio_unix_ts         in out NUMBER,
-        pio_date            in out DATE
+        pio_ts              in out timestamp,
+        pio_dnum            in out number,
+        pio_tnum            in out number,
+        pio_unix_ts         in out number,
+        pio_date            in out date
     ),
     overriding member procedure get_attributes_info,
 -- manipulate
@@ -51,11 +51,11 @@ under APP_BASE_OBJECT(
 ) not final;
 /
 
-create or replace type body APP_EXTEND
+create or replace type body app_extend
 as
 -- static
 -- constructor
-    constructor function APP_EXTEND return self as result
+    constructor function app_extend return self as result
     is
     begin
         initialize();
@@ -63,17 +63,17 @@ as
     end;
 -- initialize
     member procedure initialize(
-        pi_name             VARCHAR2    default null,
-        pi_config_code      VARCHAR2    default null,
-        pi_description      VARCHAR2    default null,
-        pi_config           VARCHAR2    default null,
-        pi_mode             VARCHAR2    default null
+        pi_name             varchar2    default null,
+        pi_config_code      varchar2    default null,
+        pi_description      varchar2    default null,
+        pi_config           varchar2    default null,
+        pi_mode             varchar2    default null
     )
     is
     begin
-        (self as APP_BASE_OBJECT).initialize(
-            pi_name         => nvl(pi_name          ,'APP_EXTEND'),
-            pi_config_code  => nvl(pi_config_code   ,'APP_EXTEND'),
+        (self as app_base_object).initialize(
+            pi_name         => nvl(pi_name          ,'app_extend'),
+            pi_config_code  => nvl(pi_config_code   ,'app_extend'),
             pi_description  => pi_description);
         -- apply custom config
         set_private_attributes(
@@ -86,15 +86,15 @@ as
     end;
 
     member procedure set_private_attributes(
-        pi_config           VARCHAR2    default null,
-        pi_mode             VARCHAR2    default null
+        pi_config           varchar2    default null,
+        pi_mode             varchar2    default null
     )
     is
     begin
         if pi_config is not null then
-            "__config__"    := new PLJSON(pi_config);     
+            "__config__"    := new pljson(pi_config);     
         else
-            "__config__"    := nvl("__app_config__".config_value, new PLJSON());
+            "__config__"    := nvl("__app_config__".config_value, new pljson());
         end if;
         
         if pi_mode is not null then
@@ -105,11 +105,11 @@ as
     end;
 
     member procedure get_datetime_dim(
-        pio_ts              in out TIMESTAMP,
-        pio_dnum            in out NUMBER,
-        pio_tnum            in out NUMBER,
-        pio_unix_ts         in out NUMBER,
-        pio_date            in out DATE
+        pio_ts              in out timestamp,
+        pio_dnum            in out number,
+        pio_tnum            in out number,
+        pio_unix_ts         in out number,
+        pio_date            in out date
     )
     is
     begin
@@ -117,14 +117,14 @@ as
         pio_dnum        := app_util.get_dnum(pio_ts);
         pio_tnum        := app_util.get_tnum(pio_ts);
         pio_unix_ts     := app_util.get_unix_ts(pio_ts);
-        pio_date        := cast(pio_ts as DATE);
+        pio_date        := cast(pio_ts as date);
 
     end;
 
     overriding member procedure get_attributes_info
     is
     begin
-        (self as APP_BASE_OBJECT).get_attributes_info();
+        (self as app_base_object).get_attributes_info();
         "__attributes__".put('__mode__'         ,"__mode__");
         "__attributes__".put('__config__'       ,"__config__".to_char(false));
         "__attributes__".put('created_ts'       ,created_ts);
@@ -171,7 +171,7 @@ as
     overriding member procedure update_all
     is
     begin
-        (self as APP_BASE_OBJECT).update_all();
+        (self as app_base_object).update_all();
         get_duration();
         get_updated_datetime_dim();
     end;
