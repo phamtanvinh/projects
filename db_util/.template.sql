@@ -1,10 +1,10 @@
 /* **********************************************************************************
-*   TYPE_TEMPLATE
+*   type_template
 ** *********************************************************************************/
 
-create or replace type TYPE_TEMPLATE force
+create or replace type type_template force
 as object(
-    __name__        VARCHAR2(64),
+    __name__        varchar2(64),
 -- static
 -- constructor
 -- initialize
@@ -12,7 +12,7 @@ as object(
 );
 /
 
-create or replace type body TYPE_TEMPLATE
+create or replace type body type_template
 as
 -- static
 -- constructor
@@ -22,11 +22,11 @@ end;
 /
 
 /* **********************************************************************************
-*   TYPE_TEMPLATE
+*   type_template
 ** *********************************************************************************/
 
-create or replace type TYPE_TEMPLATE force
-under APP_BASE_OBJECT(
+create or replace type type_template force
+under app_base_object(
 -- static
 -- constructor
 -- initialize
@@ -37,7 +37,7 @@ under APP_BASE_OBJECT(
 );
 /
 
-create or replace type body TYPE_TEMPLATE
+create or replace type body type_template
 as
 -- static
 -- constructor
