@@ -1,4 +1,3 @@
-
 create or replace package app_meta_data_util
 as
 /* **********************************************************************************
@@ -7,8 +6,9 @@ as
  *  description: 
  * **********************************************************************************/
 -- global
-    g_prefix                pljson := new pljson();
-    g_suffix                pljson := new pljson();
+    g_config                pljson;
+    g_prefix                pljson;
+    g_suffix                pljson;
     function get_object_name(
         pi_object_name      varchar2,
         pi_prefix           varchar2 default null,

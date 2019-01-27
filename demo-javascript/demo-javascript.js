@@ -4,9 +4,7 @@ function square(number){
     return number*number
 }
 
-function myFunc(theObject){
-    theObject.make = 'Toyota';
-}
+function myFunc(theObject){    theObject.make = 'Toyota'; }
 
 console.log(square(9))
 
